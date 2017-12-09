@@ -68,41 +68,45 @@ void menuListaEmprestimo (){
     printf ("Por Favor escolha uma das opções acima...");
 }
 
-void cadastroLivro(LIVROS *b, int *x){
+void cadastroLivro(LIVROS b, int *x){
     int o;
     char c;
     do{
+    fp=fopen("Livros.dat", "ab+");
     printf("CADASTRO DE LIVROS\n");
+    setbuf(stdin, NULL);
     printf("DIGITE NOME DO LIVRO:");
-    gets(b->nomeLivro);
+    gets(b.nomeLivro);
     setbuf(stdin, NULL);
     printf("DIGITE NOME DO AUTOR:");
-    gets(b->nomeAutor);
+    gets(b.nomeAutor);
     setbuf(stdin, NULL);
     printf("DIGITE AREA DO LIVRO:");
-    gets (b->area);
+    gets (b.area);
     setbuf(stdin, NULL);
     printf("DIGITE QUANTIDADE DO LIVRO:");
-    scanf("%d", &b->qtda);
+    scanf("%d", &b.qtda);
     setbuf(stdin, NULL);
-    b->codLivro=*x+1*1000+*x;
-    *x++;
-    fp=fopen("Livros.dat", "ab+");
+    b.codLivro=*x+1*1000+*x;
+    (*x)++;
     fseek(fp,0,SEEK_END);
     fwrite(&b, sizeof(b), 1, fp);
     fclose(fp);
     printf("O LIVRO FOI CADASTRADO CORRETAMENTE!\n");
-    printf ("CADASTRAR OUTRO? (S) par sim e (N) para não");
-    scanf ("%c", &c);
+    printf ("CADASTRAR OUTRO? (S) PARA SIM OU (N) PARA NÃO\n");
+    scanf("%c", &c);
     toupper(c);
+    setbuf(stdin, NULL);
     if (c=='S'){
         system("cls");
         cadastroLivro(b,x);
     }
-    if (c=='N'){
-            menuAcervo();
-        }
+    else {
+        menuAcervo();
+        system("cls");
+        fflush(stdin);
     }
+}
     while (o!=127);
     system("pause");
 }
@@ -130,19 +134,22 @@ void editarLivro(LIVROS *b){
             fseek(fp,ftell(fp)-sizeof(b),0);
             fwrite(&b,sizeof(b),1,fp);
             fclose(fp);
+        }
             printf ("EDITAR OUTRO? (S) par sim e (N) para não");
             scanf ("%c", &c);
             toupper(c);
             if (c=='S'){
                 system("cls");
                 editarLivro(b);
+                fflush(stdin);
             }
-            if (c=='N'){
+            else{
                     menuAcervo();
+                    fflush(stdin);
                 }
         }
-    }
 }
+
 
 void removerLivro(LIVROS *b){
     int d;
@@ -181,17 +188,17 @@ void removerLivro(LIVROS *b){
     }
 }
 
-void listarLivro(LIVROS *b){
+void listarLivro(LIVROS b){
     int i=0;
     fp=fopen("Livros.dat","rb");
     while(fread(&b,sizeof(b),1,fp)==1){
         printf("NOME:\t\t\tCÓDIGO:\t\t\tAUTOR:\t\t\tQUANTIDADE:\t\t\tÁREA:\n");
-        printf("%s\t", b->nomeLivro);
-        printf("%d\t", b->codLivro);
-        printf("%s\t", b->nomeAutor);
-        printf("%d\t", b->qtda);
-        printf("%s\t", b->area);
-        i=i+b->qtda;
+        printf("%s\t", b.nomeLivro);
+        printf("%d\t", b.codLivro);
+        printf("%s\t", b.nomeAutor);
+        printf("%d\t", b.qtda);
+        printf("%s\n", b.area);
+        i=i+b.qtda;
     }
     printf("TOTAL DE LIVROS: %d\n", i);
     fclose(fp);
@@ -203,9 +210,9 @@ void listarLivro(LIVROS *b){
 
 main(){
     setlocale (LC_ALL, "Portuguese");
-    ALUNOS *a;
-    LIVROS *b;
-    int opt, *x=0;
+    ALUNOS a;
+    LIVROS b;
+    int opt, x=0;
 
     do {
         setbuf(stdin,NULL);
@@ -220,15 +227,15 @@ main(){
                     switch (opt){
                         case 1:
                             system("cls");
-                            cadastroLivro(b,x);
+                            cadastroLivro(b,&x);
                             break;
                         case 2:
                             system("cls");
-                            editarLivro(b);
+                            editarLivro(&b);
                             break;
                         case 3:
                             system("cls");
-                            removerLivro(b);
+                            removerLivro(&b);
                             break;
                         case 4:
                             system("cls");
