@@ -5,6 +5,9 @@
 #include <ctype.h>
 #include <conio.h>
 #include <locale.h>
+#include <windows.h>
+
+#define TAM 35
 
 FILE *fp, *ft, *fs;
 
@@ -19,13 +22,15 @@ typedef struct {
 }ALUNOS;
 
 void menuPrincipal (){
-    printf ("MENU PRINCIPAL\n");
-    printf ("1. Acervo\n");
-    printf ("2. Alunos\n");
-    printf ("3. Empréstimos\n");
-    printf ("4. Débitos de devoluções\n");
-    printf ("5. Sair\n");
-    printf ("Por Favor escolha uma das opções acima...");
+    linhasup();
+    linhlat("MENU PRINCIPAL");
+    linhlat("1. Acervo");
+    linhlat("2. Alunos");
+    linhlat("3. Emprestimos");
+    linhlat("4. Debitos de devolucoes");
+    linhlat("5. Sair");
+    linhainf();
+    printf("\t\t\t\tPor Favor escolha uma das opcoes acima...");
 }
 
 void menuAcervo (){
@@ -208,12 +213,54 @@ void listarLivro(LIVROS b){
     system("pause");
 }
 
+void linhasup(){
+    int i;
+    printf("\t\t\t\t%c", 201);
+    for(i=0;i<TAM;i++)
+        printf("%c", 205);
+    printf("%c\n", 187);
+}
+void linhainf(){
+    int i;
+    printf("\t\t\t\t%c", 200);
+    for(i=0;i<TAM;i++)
+        printf("%c", 205);
+    printf("%c\n", 188);
+}
+void linhlat(char st[]){
+    int i, contlet = 0;
+    for(i=0;i<TAM;i++){
+        if(st[i]=='\0')
+            break;
+        else
+            contlet++;
+    }
+    printf("\t\t\t\t%c", 186);
+    printf("%s", st);
+    while(contlet<TAM){
+        printf("%c", 32);
+        contlet++;
+    }
+    printf("%c\n", 186);
+}
+
+void inicio(){
+    int i;
+    linhasup();
+    linhlat("CARREGANDO POR FAVOR AGUARDE...");
+    linhainf();
+    for(i=0;i<104;i++){
+        Sleep(20);
+        printf("%c", 219);
+    }
+}
+
 main(){
-    setlocale (LC_ALL, "Portuguese");
+    //setlocale(LC_ALL, "");
     ALUNOS a;
     LIVROS b;
     int opt, x=0;
-
+    inicio();
     do {
         setbuf(stdin,NULL);
         system("cls");
