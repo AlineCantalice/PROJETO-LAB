@@ -10,7 +10,7 @@ FILE *fp, *ft, *fs;
 
 typedef struct {
     char nomeLivro[41], nomeAutor[41], area[41];
-    int codLivro, qtda;
+    int codLivro, qtda, numero;
 }LIVROS;
 
 typedef struct {
@@ -68,10 +68,9 @@ void menuListaEmprestimo (){
     printf ("Por Favor escolha uma das opções acima...");
 }
 
-void cadastroLivro(LIVROS b, int *x){
+void cadastroLivro(LIVROS b){
     int o;
     char c;
-    do{
     fp=fopen("Livros.dat", "ab+");
     printf("CADASTRO DE LIVROS\n");
     setbuf(stdin, NULL);
@@ -87,8 +86,8 @@ void cadastroLivro(LIVROS b, int *x){
     printf("DIGITE QUANTIDADE DO LIVRO:");
     scanf("%d", &b.qtda);
     setbuf(stdin, NULL);
-    b.codLivro=*x+1*1000+*x;
-    (*x)++;
+    b.codLivro=(b.numero)+1*1000+(b.numero);
+    (b.numero)++;
     fseek(fp,0,SEEK_END);
     fwrite(&b, sizeof(b), 1, fp);
     fclose(fp);
@@ -99,15 +98,13 @@ void cadastroLivro(LIVROS b, int *x){
     setbuf(stdin, NULL);
     if (c=='S'){
         system("cls");
-        cadastroLivro(b,x);
+        cadastroLivro(b);
     }
     else {
         menuAcervo();
         system("cls");
         fflush(stdin);
     }
-}
-    while (o!=127);
     system("pause");
 }
 
@@ -227,7 +224,7 @@ main(){
                     switch (opt){
                         case 1:
                             system("cls");
-                            cadastroLivro(b,&x);
+                            cadastroLivro(b);
                             break;
                         case 2:
                             system("cls");
@@ -241,6 +238,9 @@ main(){
                             system("cls");
                             listarLivro(b);
                             break;
+			case 5:
+			    system("cls");
+			    menuPrincipal();
                     }
                 break;
 
