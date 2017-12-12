@@ -276,7 +276,7 @@ void inicio(){
 }
 
 main(){
-    //setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "");
     ALUNOS a;
     LIVROS b;
     int opt, x=0;
