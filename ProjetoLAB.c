@@ -5,6 +5,9 @@
 #include <ctype.h>
 #include <conio.h>
 #include <locale.h>
+#include <windows.h>
+
+#define TAM 35
 
 FILE *fp, *ft, *fs;
 
@@ -19,53 +22,68 @@ typedef struct {
 }ALUNOS;
 
 void menuPrincipal (){
-    printf ("MENU PRINCIPAL\n");
-    printf ("1. Acervo\n");
-    printf ("2. Alunos\n");
-    printf ("3. Empréstimos\n");
-    printf ("4. Débitos de devoluções\n");
-    printf ("5. Sair\n");
-    printf ("Por Favor escolha uma das opções acima...");
+    linhasup();
+    linhalat("MENU PRINCIPAL");
+    linhamed();
+    linhalat("1. Acervo");
+    linhalat("2. Alunos");
+    linhalat("3. Emprestimos");
+    linhalat("4. Debitos de devolucoes");
+    linhalat("5. Sair");
+    linhainf();
+    printf("\t\t\t\tPor Favor escolha uma das opcoes acima...");
 }
 
 void menuAcervo (){
-    printf ("ACERVO\n");
-    printf ("1. Cadastrar livro\n");
-    printf ("2. Editar livro\n");
-    printf ("3. Remover livro\n");
-    printf ("4. Listar livros cadastrados\n");
-    printf ("5. Voltar para o menu principal\n");
-    printf ("Por Favor escolha uma das opções acima...");
+    linhasup();
+    linhalat("ACERVO");
+    linhamed();
+    linhalat("1. Cadastrar livro");
+    linhalat("2. Editar livro");
+    linhalat("3. Remover livro");
+    linhalat("4. Listar livros cadastrados");
+    linhalat("5. Voltar para o menu principal");
+    linhainf();
+    printf ("\t\t\t\tPor Favor escolha uma das opcoes acima...");
 }
 
 void menuAluno (){
-    printf ("ALUNOS\n");
-    printf ("1. Cadastrar aluno\n");
-    printf ("2. Editar aluno\n");
-    printf ("3. Remover aluno\n");
-    printf ("4. Listar alunos cadastrados\n");
-    printf ("5. Voltar para o menu principal\n");
-    printf ("Por Favor escolha uma das opções acima...");
+    linhasup();
+    linhalat("ALUNOS");
+    linhamed();
+    linhalat("1. Cadastrar aluno");
+    linhalat("2. Editar aluno");
+    linhalat("3. Remover aluno");
+    linhalat("4. Listar alunos cadastrados");
+    linhalat("5. Voltar para o menu principal");
+    linhainf();
+    printf ("\t\t\t\tPor Favor escolha uma das opcos acima...");
 }
 
 void menuEmprestimo (){
-    printf ("EMPRÉSTIMOS\n");
-    printf ("1. Novo empréstimo\n");
-    printf ("2. Confirmar devolução\n");
-    printf ("3. Cancelar empréstimo\n");
-    printf ("4. Listar empréstimos\n");
-    printf ("5. Voltar para o menu principal\n");
-    printf ("Por Favor escolha uma das opções acima...");
+    linhasup();
+    linhalat("EMPRESTIMOS");
+    linhamed();
+    linhalat("1. Novo emprestimo");
+    linhalat("2. Confirmar devolucao");
+    linhalat("3. Cancelar emprestimo");
+    linhalat("4. Listar emprestimos");
+    linhalat("5. Voltar para o menu principal");
+    linhainf();
+    printf("\t\t\t\tPor Favor escolha uma das opcoes acima...");
 }
 
 void menuListaEmprestimo (){
-    printf ("LISTAR EMPRÉSTIMOS\n");
-    printf ("1. Listar todos os empréstimos\n");
-    printf ("2. Listar por livro específico\n");
-    printf ("3. Listar por aluno específico\n");
-    printf ("4. Voltar para menu anterior\n");
-    printf ("5. Voltar para o menu principal");
-    printf ("Por Favor escolha uma das opções acima...");
+    linhasup();
+    printf ("LISTAR EMPRESTIMOS");
+    linhamed();
+    linhalat("1. Listar todos os emprestimos");
+    linhalat("2. Listar por livro especifico");
+    linhalat("3. Listar por aluno especifico");
+    linhalat("4. Voltar para menu anterior");
+    linhalat("5. Voltar para o menu principal");
+    linhainf();
+    printf ("\t\t\t\tPor Favor escolha uma das opções acima...");
 }
 
 void cadastroLivro(LIVROS b){
@@ -205,12 +223,64 @@ void listarLivro(LIVROS b){
     system("pause");
 }
 
+void linhasup(){
+    int i;
+    printf("\t\t\t\t%c", 201);
+    for(i=0;i<TAM;i++)
+        printf("%c", 205);
+    printf("%c\n", 187);
+}
+
+void linhainf(){
+    int i;
+    printf("\t\t\t\t%c", 200);
+    for(i=0;i<TAM;i++)
+        printf("%c", 205);
+    printf("%c\n", 188);
+}
+
+void linhamed(){
+    int i;
+    printf("\t\t\t\t%c", 204);
+    for(i=0;i<TAM;i++)
+        printf("%c", 205);
+    printf("%c\n", 185);
+}
+
+void linhalat(char st[]){
+    int i, contlet = 0;
+    for(i=0;i<TAM;i++){
+        if(st[i]=='\0')
+            break;
+        else
+            contlet++;
+    }
+    printf("\t\t\t\t%c", 186);
+    printf("%s", st);
+    while(contlet<TAM){
+        printf("%c", 32);
+        contlet++;
+    }
+    printf("%c\n", 186);
+}
+
+void inicio(){
+    int i;
+    linhasup();
+    linhalat("CARREGANDO POR FAVOR AGUARDE...");
+    linhainf();
+    for(i=0;i<104;i++){
+        Sleep(1);
+        printf("%c", 219);
+    }
+}
+
 main(){
-    setlocale (LC_ALL, "Portuguese");
+    //setlocale(LC_ALL, "");
     ALUNOS a;
     LIVROS b;
     int opt, x=0;
-
+    inicio();
     do {
         setbuf(stdin,NULL);
         system("cls");
