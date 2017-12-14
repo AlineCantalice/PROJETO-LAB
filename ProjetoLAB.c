@@ -189,6 +189,18 @@ void cadastroLivro(LIVROS b){
     printf("CADASTRO DE LIVROS\n");
     setbuf(stdin, NULL);
 
+    //gera-se o codigo, precisa vim anres do cadastro.
+    fseek (fp,ftell(fp)-sizeof(b),SEEK_END);
+
+    if (fread(&b,sizeof(b),1,fp)!=1){
+    	b.codLivro= 1000;
+	}
+	else {
+		fscanf(fp,"%d",&b.codLivro);
+		b.codLivro=b.codLivro+1;
+	}
+
+    //cadastro do livros.
     printf("DIGITE NOME DO LIVRO:");
     gets(b.nomeLivro);
     strupr(b.nomeLivro);
@@ -208,35 +220,23 @@ void cadastroLivro(LIVROS b){
     scanf("%d", &b.qtda);
     setbuf(stdin, NULL);
 
-    fseek (fp,ftell(fp)-sizeof(b),SEEK_END);
-    fscanf(fp,"%d",b.numero);
-
-    if (fread(&b,sizeof(b),1,fp)!=1){
-    	b.codLivro= 1000;
-	}
-	else {
-		fseek(fp,sizeof(b),SEEK_END);
-		fscanf(fp,"%d",&b.codLivro);
-	}
-
-    b.codLivro=b.codLivro+1;
-    (b.numero)++;
-
+    fseek(fp,0,SEEK_END);
     fwrite(&b, sizeof(b), 1, fp);
     fclose(fp);
 
     printf("O LIVRO FOI CADASTRADO CORRETAMENTE!\n");
     printf ("CADASTRAR OUTRO? (S) PARA SIM OU (N) PARA NAO\n");
-    scanf("%c", &c);
+    c=getch();
     setbuf(stdin, NULL);
-
-    if (c=='S' || c=='s'){
+    c=toupper(c);
+    if (c=='S'){
         system("cls");
         cadastroLivro(b);
     }
     else {
         system("cls");
         menuAcervo();
+        fflush(stdin);
     }
 }
 
@@ -244,7 +244,7 @@ void editarLivro(LIVROS b){
     int d;
     char c;
 
-    printf("EDICAO DE LIVROS:\n");
+    printf("EDIÇÃO DE LIVROS:\n");
 
     printf("DIGITE O CODIGO DO LIVRO PARA EDITAR:");
     scanf("%d", &d);
@@ -260,10 +260,17 @@ void editarLivro(LIVROS b){
             printf("DIGITE NOVO NOME:");
             setbuf(stdin,NULL);
             gets(b.nomeLivro);
+            strupr(b.nomeLivro);
             setbuf(stdin,NULL);
 
             printf("DIGITE NOME DO AUTOR:");
             gets(b.nomeAutor);
+            strupr(b.nomeAutor);
+            setbuf(stdin, NULL);
+
+            printf("DIGITE AREA DO LIVRO:");
+            gets(b.area);
+            strupr(b.area);
             setbuf(stdin, NULL);
 
             printf("DIGITE QUANTIDADE:");
@@ -274,16 +281,16 @@ void editarLivro(LIVROS b){
             fclose(fp);
         }
             printf ("EDITAR OUTRO? (S) PARA SIM (N) PARA NAO");
-            scanf ("%c", &c);
-
-            if (c=='S' || c=='s'){
+            c=getch();
+            c=toupper(c);
+            if (c=='S'){
                 system("cls");
                 editarLivro(b);
                 fflush(stdin);
             }
             else{
-                    system("cls");
                     menuAcervo();
+                    fflush(stdin);
                 }
         }
 }
@@ -311,9 +318,10 @@ void removerLivro(LIVROS b){
         }
 
         printf("DELETAR? (S) PARA SIM OU (N) PARA NAO");
-        scanf("%c", &c);
+        c=getch();
+        c=toupper(c);
 
-        if (c=='S' || c=='s'){
+        if (c=='S'){
             ft=fopen("remove.dat", "wb+");
             rewind(fp);
             while(fread(&b,sizeof(b),1,fp)==1){
@@ -335,7 +343,7 @@ void listarLivro(LIVROS b){
     int i=0;
 
     fp=fopen("Livros.dat","rb");
-printf("NOME:\t\t\tCODIGO:\t\t\tAUTOR:\t\t\tQUANTIDADE:\t\t\tAREA:\n");
+    printf("NOME:\t\t\tCODIGO:\t\t\tAUTOR:\t\t\tQUANTIDADE:\t\t\tAREA:\n");
     while(fread(&b,sizeof(b),1,fp)==1){
         printf("%s\t", b.nomeLivro);
         printf("%d\t", b.codLivro);
@@ -374,7 +382,6 @@ void cadastroAluno(ALUNOS a){
 
     printf("DIGITE CPF DO ALUNO:");
     gets (a.cpf);
-    strupr(a.cpf);
     setbuf(stdin, NULL);
 
     fseek(fp,0,SEEK_END);
@@ -383,10 +390,11 @@ void cadastroAluno(ALUNOS a){
 
     printf("O ALUNO FOI CADASTRADO CORRETAMENTE!\n");
     printf ("CADASTRAR OUTRO? (S) PARA SIM OU (N) PARA NAO\n");
-    scanf("%c", &c);
+    c=getch();
+    c=toupper(c);
     setbuf(stdin, NULL);
 
-    if (c=='S' || c=='s'){
+    if (c=='S'){
         system("cls");
         cadastroAluno(a);
     }
@@ -431,9 +439,10 @@ void editarAluno(ALUNOS a){
             fclose(fp);
         }
             printf ("EDITAR OUTRO? (S) PARA SIM (N) PARA NAO");
-            scanf ("%c", &c);
+            c=getch();
+            c=toupper(c);
 
-            if (c=='S' || c=='s'){
+            if (c=='S'){
                 system("cls");
                 editarAluno(a);
             }
@@ -463,9 +472,10 @@ void removerAluno(ALUNOS a){
         }
 
         printf("DELETAR? (S) PARA SIM OU (N) PARA NAO");
-        scanf("%c", &c);
+        c=getch();
+        c=toupper(c);
 
-        if (c=='S' || c=='s'){
+        if (c=='S'){
             ft=fopen("remove.dat", "wb+");
             rewind(fp);
             while(fread(&a,sizeof(a),1,fp)==1){
@@ -487,11 +497,12 @@ void listarAluno(ALUNOS a){
     int i=0;
 
     fp=fopen("Alunos.dat","rb");
-printf("NOME:\t\t\tMATRICULA:\t\t\tCPF:\n");
+    printf("NOME:\t\t\tMATRICULA:\t\t\tCPF:\n");
     while(fread(&a,sizeof(a),1,fp)==1){
         printf("%s\t", a.nomeAluno);
         printf("%s\t", a.matricula);
-        printf("%s\t", a.cpf);
+        printf("%s\n", a.cpf);
+        i++;
     }
     fclose(fp);
 
@@ -532,8 +543,8 @@ main(){
                             listarLivro(b);
                             break;
                         case '5':
-                        system("cls");
-                        menuPrincipal();
+                            system("cls");
+                            menuPrincipal();
                     }
                 break;
 
