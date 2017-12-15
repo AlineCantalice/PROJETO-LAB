@@ -11,10 +11,6 @@
 
 FILE *fp, *ft, *fs;
 
-typedef struct{
-
-}EMPRESTIMOS;
-
 typedef struct {
     char nomeLivro[41], nomeAutor[41], area[41];
     int codLivro, qtda, numero;
@@ -22,8 +18,12 @@ typedef struct {
 
 typedef struct {
     char nomeAluno[41], matricula[15], cpf[19];
-    int codAluno;
 }ALUNOS;
+
+typedef struct{
+    char aluno[41], livro[41], mat[15];
+    int qtdaEmprestimo, mm, dd, aa, cod;
+}EMPRESTIMOS;
 
 COORD coord = {0, 0};
 COORD max_res,cursor_size;
@@ -104,7 +104,6 @@ void fim(){
 
 void menuPrincipal (){
     linhasup();
-    system("cls");
     linhalat("MENU PRINCIPAL");
     linhamed();
     linhalat("1. Acervo");
@@ -118,7 +117,6 @@ void menuPrincipal (){
 
 char menuAcervo (){
     char o;
-    system("cls");
     linhasup();
     linhalat("ACERVO");
     linhamed();
@@ -135,7 +133,6 @@ char menuAcervo (){
 
 char menuAluno (){
     char o;
-    system("cls");
     linhasup();
     linhalat("ALUNOS");
     linhamed();
@@ -153,7 +150,6 @@ char menuAluno (){
 char menuEmprestimo (){
     char o;
     linhasup();
-    system("cls");
     linhalat("EMPRESTIMOS");
     linhamed();
     linhalat("1. Novo emprestimo");
@@ -167,9 +163,10 @@ char menuEmprestimo (){
     return o;
 }
 
-void menuListaEmprestimo (){
+char menuListaEmprestimo (){
+    char o;
     linhasup();
-    printf ("LISTAR EMPRESTIMOS");
+    linhalat("LISTAR EMPRESTIMOS");
     linhamed();
     linhalat("1. Listar todos os emprestimos");
     linhalat("2. Listar por livro especifico");
@@ -177,7 +174,9 @@ void menuListaEmprestimo (){
     linhalat("4. Voltar para menu anterior");
     linhalat("5. Voltar para o menu principal");
     linhainf();
-    printf ("\t\t\t\tPor Favor escolha uma das opções acima...");
+    printf ("\t\t\t\tPor Favor escolha uma das opcoes acima...");
+    o=getch();
+    return o;
 }
 
 void cadastroLivro(LIVROS b){
@@ -235,8 +234,8 @@ void cadastroLivro(LIVROS b){
     }
     else {
         system("cls");
-        menuAcervo();
         fflush(stdin);
+        menuAcervo();
     }
 }
 
@@ -280,19 +279,21 @@ void editarLivro(LIVROS b){
             fwrite(&b,sizeof(b),1,fp);
             fclose(fp);
         }
+    }
+
             printf ("EDITAR OUTRO? (S) PARA SIM (N) PARA NAO");
             c=getch();
             c=toupper(c);
+
             if (c=='S'){
                 system("cls");
                 editarLivro(b);
-                fflush(stdin);
             }
             else{
-                    menuAcervo();
+                    system("cls");
                     fflush(stdin);
+                    menuAcervo();
                 }
-        }
 }
 
 
@@ -302,11 +303,11 @@ void removerLivro(LIVROS b){
 
     printf("REMOVER LIVRO\n");
 
-    printf("DIGITE CODIGO DO LIVRO PARA REMOVER:\n");
-    scanf("%d", &d);
-
     fp=fopen("Livros.dat", "rb+");
     rewind(fp);
+
+    printf("DIGITE CODIGO DO LIVRO PARA REMOVER:\n");
+    scanf("%d", &d);
 
     while(fread(&b,sizeof(b),1,fp)==1){
         if (d==b.codLivro){
@@ -315,11 +316,11 @@ void removerLivro(LIVROS b){
             printf("AUTOR:%s\n", b.nomeAutor);
             printf("AREA: %s\n", b.area);
             printf("QUANTIDADE: %d\n", b.qtda);
-        }
 
         printf("DELETAR? (S) PARA SIM OU (N) PARA NAO");
         c=getch();
         c=toupper(c);
+        }
 
         if (c=='S'){
             ft=fopen("remove.dat", "wb+");
@@ -410,13 +411,14 @@ void editarAluno(ALUNOS a){
     printf("EDICAO DE ALUNOS:\n");
 
     printf("DIGITE MATRICULA DO ALUNO PARA EDITAR:");
-    scanf("%d", &d);
+    gets(d);
+    setbuf(stdin, NULL);
 
     fp=fopen("Alunos.dat", "rb+");
     rewind(fp);
 
     while (fread(&a, sizeof(a),1,fp)==1){
-        if(strcmp(a.matricula,d)==0){
+        if(strcmp(d,a.matricula)==0){
             printf("NOME:%s\n", a.nomeAluno);
             printf("CPF:%s\n", a.cpf);
 
@@ -438,6 +440,11 @@ void editarAluno(ALUNOS a){
             fwrite(&a,sizeof(a),1,fp);
             fclose(fp);
         }
+    }
+    if(strcmp(d,a.matricula)!=0){
+            printf("ALUNO NAO CADASTRADO!\n");
+        }
+
             printf ("EDITAR OUTRO? (S) PARA SIM (N) PARA NAO");
             c=getch();
             c=toupper(c);
@@ -450,7 +457,6 @@ void editarAluno(ALUNOS a){
                     system("cls");
                     menuAluno();
                 }
-        }
 }
 
 void removerAluno(ALUNOS a){
@@ -458,33 +464,33 @@ void removerAluno(ALUNOS a){
 
     printf("REMOVER ALUNO\n");
 
-    printf("DIGITE MATRICULA DO ALUNO PARA REMOVER:\n");
-    gets(a.matricula);
-
     fp=fopen("Alunos.dat", "rb+");
     rewind(fp);
 
+    printf("DIGITE MATRICULA DO ALUNO PARA REMOVER:\n");
+    gets(d);
+    setbuf(stdin, NULL);
+
     while(fread(&a,sizeof(a),1,fp)==1){
-        if (strcmp(a.matricula,d)==0){
+        if (strcmp(d,a.matricula)==0){
             printf("NOME: %s\n", a.nomeAluno);
-            printf("MATRICULA: %d\n", a.matricula);
+            printf("MATRICULA: %s\n", a.matricula);
             printf("CPF:%s\n", a.cpf);
-        }
 
         printf("DELETAR? (S) PARA SIM OU (N) PARA NAO");
         c=getch();
         c=toupper(c);
+        }
 
         if (c=='S'){
             ft=fopen("remove.dat", "wb+");
             rewind(fp);
             while(fread(&a,sizeof(a),1,fp)==1){
-		    if(strcmp(a.matricula,d)!=0)
-		    {
-			fseek(ft,0,SEEK_CUR);
-			fwrite(&a,sizeof(a),1,ft);
-		    }
-		}
+                if(strcmp(d,a.matricula)!=0){
+                fseek(ft,0,SEEK_CUR);
+                fwrite(&a,sizeof(a),1,ft);
+                }
+            }
 		fclose(ft);
 		fclose(fp);
 		remove("Alunos.dat");
@@ -512,9 +518,135 @@ void listarAluno(ALUNOS a){
     system("pause");
 }
 
+void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c){
+   
+}
+
+void devolucao(EMPRESTIMOS c){
+
+}
+
+void cancelarEmprestimo(EMPRESTIMOS c){
+     char o;
+     int d;
+
+    printf("CANCELAR EMPRESTIMO\n");
+
+    fp=fopen("Emprestimos.dat", "rb+");
+    rewind(fp);
+
+    printf("DIGITE CODIGO DO LIVRO:\n");
+    scanf("%d", &d);
+
+    while(fread(&c,sizeof(c),1,fp)==1){
+        if (d==c.cod){
+            printf("NOME DO ALUNO: %s\n", c.aluno);
+            printf("MATRICULA: %s\n", c.mat);
+            printf("NOME DO LIVRO:%s\n", c.livro);
+            printf("CODIGO: %d", c.cod);
+
+        printf("CANCELAR? (S) PARA SIM OU (N) PARA NAO");
+        o=getch();
+        o=toupper(o);
+        }
+
+        if (o=='S'){
+            ft=fopen("remove.dat", "wb+");
+            rewind(fp);
+            while(fread(&c,sizeof(c),1,fp)==1){
+                if(d==c.cod){
+                fseek(ft,0,SEEK_CUR);
+                fwrite(&c,sizeof(c),1,ft);
+                }
+            }
+		fclose(ft);
+		fclose(fp);
+		remove("Emprestimos.dat");
+		rename("remove.dat","Emprestimos.dat");
+		}
+    }
+}
+
+void listarTodosEmprestimo(EMPRESTIMOS c){
+    int i=0;
+
+    fp=fopen("Emprestimos.dat","rb");
+    printf("NOME ALUNO:\t\t\tMATRICULA:\t\t\tNOME LIVRO:\t\t\tCODIGO LIVRO:\n");
+    while(fread(&c,sizeof(c),1,fp)==1){
+        printf("%s\t", c.aluno);
+        printf("%s\t", c.mat);
+        printf("%s\t", c.livro);
+        printf("%d\n", c.cod);
+        i++;
+    }
+    fclose(fp);
+
+    if(i==0){
+        printf("NENHUM EMPRESTIMO CADASTRADO!\n");
+    }
+    system("pause");
+}
+
+void listarEmprestimoLivro(EMPRESTIMOS c){
+    int i=0, d;
+
+    fp=fopen("Emprestimos.dat","rb");
+    printf("DIGITE CODIGO DO LIVRO:");
+    scanf("%d", &d);
+
+    printf("NOME ALUNO:\t\t\tMATRICULA:\t\t\tNOME LIVRO:\t\t\tCODIGO LIVRO:\n");
+    while(fread(&c,sizeof(c),1,fp)==1){
+        if(d==c.cod){
+            printf("%s\t", c.aluno);
+            printf("%s\t", c.mat);
+            printf("%s\t", c.livro);
+            printf("%d\n", c.cod);
+            i++;
+        }
+    }
+    fclose(fp);
+
+    if(i==0){
+        printf("\nNENHUM EMPRESTIMO CADASTRADO!\n");
+    }
+    system("pause");
+}
+
+void listarEmprestimoAluno(EMPRESTIMOS c){
+    int i=0;
+    char m[15];
+
+    fp=fopen("Emprestimos.dat","rb");
+    printf("DIGITE MATRICULA DO ALUNO:");
+    gets(m);
+    setbuf(stdin, NULL);
+
+    printf("NOME ALUNO:\t\t\tMATRICULA:\t\t\tNOME LIVRO:\t\t\tCODIGO LIVRO:\n");
+    while(fread(&c,sizeof(c),1,fp)==1){
+        if(strcmp(c.mat,m)==0){
+            printf("%s\t", c.aluno);
+            printf("%s\t", c.mat);
+            printf("%s\t", c.livro);
+            printf("%d\n", c.cod);
+            i++;
+        }
+    }
+    fclose(fp);
+
+    if(i==0){
+        printf("\nNENHUM EMPRESTIMO CADASTRADO!\n");
+    }
+    system("pause");
+}
+
+void debitos(){
+
+}
+
 main(){
     ALUNOS a;
     LIVROS b;
+    EMPRESTIMOS c;
     char mopt, opt;
     inicio();
     do {
@@ -524,7 +656,8 @@ main(){
         mopt=getch();
         switch (mopt){
             case '1':
-                opt=menuAcervo();
+                    system("cls");
+                    opt=menuAcervo();
                     switch (opt){
                         case '1':
                             system("cls");
@@ -545,10 +678,13 @@ main(){
                         case '5':
                             system("cls");
                             menuPrincipal();
+                        default:
+                            printf("OPCAO INVALIDA!!\n");
+                            break;
                     }
                 break;
-
             case '2':
+                system("cls");
                 opt=menuAluno();
                     switch (opt){
                         case '1':
@@ -567,15 +703,63 @@ main(){
                             system("cls");
                             listarAluno(a);
                             break;
+                        case '5':
+                            system("cls");
+                            menuPrincipal();
                     }
                     break;
 
             case '3':
+                system("cls");
                 opt=menuEmprestimo();
+                switch(opt){
+                    case '1':
+                        system("cls");
+                        novoEmprestimo(b,a,c);
+                        break;
+                    case '2':
+                        system("cls");
+                        devolucao(c);
+                        break;
+                    case '3':
+                        system("cls");
+                        cancelarEmprestimo(c);
+                        break;
+                    case '4':
+                        system("cls");
+                        opt=menuListaEmprestimo();
+                        switch(opt){
+                            case '1':
+                                system("cls");
+                                listarTodosEmprestimo(c);
+                                break;
+                            case '2':
+                                system("cls");
+                                listarEmprestimoLivro(c);
+                                break;
+                            case '3':
+                                system("cls");
+                                listarEmprestimoAluno(c);
+                                break;
+                            case '4':
+                                system("cls");
+                                menuEmprestimo();
+                                break;
+                            case '5':
+                                system("cls");
+                                menuPrincipal();
+                                break;
+                        }
+                        break;
+                    case '5':
+                        system("cls");
+                        menuPrincipal();
+                }
                 break;
 
             case '4':
-
+                system("cls");
+                debitos();
                 break;
         }
     }
