@@ -24,7 +24,7 @@ typedef struct
 
 typedef struct
 {
-    char aluno[31], livro[2531], mat[15], dataAtual[15], dataDevolucao[15];
+    char aluno[31], livro[31], mat[15], dataAtual[15], dataDevolucao[15];
     int cod;
 } EMPRESTIMOS;
 
@@ -112,6 +112,122 @@ void fim()
         gotoxy(i,4);
         printf("%c", 219);
     }
+}
+
+/*  Trecho adaptado do código de Paulo Marcos Trentin
+    Disponível em <https://www.vivaolinux.com.br/script/Funcao-em-C-retorna-a-data-do-sistema-ja-formatada>
+    acessado em 24/12/2017*/
+
+char *formatacao(int num)
+{
+    char *retorno, ret[30];
+    int i;
+
+    if (num < 10)
+    {
+        sprintf(ret,"0%d",num);
+        retorno = ret;
+        return retorno;
+    }
+    else
+    {
+        sprintf(ret,"%d",num);
+        retorno = ret;
+        return retorno;
+    }
+}
+
+char *data(void)
+{
+
+    int dia,mes,ano;
+    char num1[6], num2[6], num3[6], num4[15], *dataEmp;
+
+    struct tm *local;
+
+    time_t t;
+
+    t = time(NULL);
+    local = localtime(&t);
+    dia = local -> tm_mday;
+    mes = local -> tm_mon + 1;
+    ano = local -> tm_year + 1900;
+
+    sprintf(num1,"%s",formatacao(dia));
+    sprintf(num2,"%s",formatacao(mes));
+    sprintf(num3,"%s",formatacao(ano));
+
+
+    sprintf(num4,"%s/%s/%s",num1,num2,num3);
+
+    dataEmp = num4;
+    return dataEmp;
+} //Fim do trecho adaptado
+
+char *dataDevolucao(void)
+{
+
+    int dia,mes,ano;
+    char num1[6], num2[6], num3[6], num4[15], *dataEmp;
+
+    struct tm *local;
+
+    time_t t;
+
+    t = time(NULL);
+    local = localtime(&t);
+
+    dia = local -> tm_mday;
+    mes = local -> tm_mon + 1;
+    ano = local -> tm_year + 1900;
+
+    dia = dia + 1;
+
+    if(mes == 2)
+    {
+        if(ano % 4 == 0 && (ano % 100 != 0 || ano % 400 == 0))
+        {
+            if(dia>29)
+            {
+
+                dia = dia - 29;
+                mes++;
+            }
+        }
+        else
+        {
+            if(dia>28)
+            {
+                dia = dia - 28;
+                mes++;
+            }
+        }
+    }
+    else if((mes==1 || mes==3 || mes==5 || mes==7 || mes==8 || mes==10 || mes==12) && dia > 31)
+    {
+        dia = dia - 31;
+        mes++;
+    }
+    else if(dia > 30)
+    {
+        dia = dia - 30;
+        mes++;
+    }
+
+    if (mes > 12)
+    {
+        mes = mes - 12;
+        ano++;
+    }
+
+    sprintf(num1,"%s",formatacao(dia));
+    sprintf(num2,"%s",formatacao(mes));
+    sprintf(num3,"%s",formatacao(ano));
+
+    sprintf(num4,"%s/%s/%s",num1,num2,num3);
+
+    dataEmp = num4;
+    return dataEmp;
 }
 
 void menuPrincipal ()
@@ -289,22 +405,29 @@ void cadastroLivro(LIVROS b)
     gotoxy(34,11);
     printf("CODIGO DO LIVRO: %d", b.codLivro);
     gotoxy(34,13);
-    printf ("CADASTRAR OUTRO? S-SIM OU N-NAO");
-    gotoxy(49,15);
-    c=getch();
-    setbuf(stdin, NULL);
-    c=toupper(c);
-    if (c=='S')
+    system("pause");
+    system("cls");
+    do
     {
-        cadastroLivro(b);
+        gotoxy(34,4);
+        printf ("CADASTRAR OUTRO? S-SIM OU N-NAO");
+        gotoxy(49,6);
+        c=getch();
+        setbuf(stdin, NULL);
+        c=toupper(c);
+        if (c=='S')
+        {
+            cadastroLivro(b);
+        }
     }
+    while(c!='N');
 }
 
 //FUNCAO PARA EDITAR O LIVRO.
-void editarLivro(LIVROS b)
+void editarLivro(LIVROS b, EMPRESTIMOS c)
 {
     int d, i=0;
-    char c;
+    char o;
 
     system("cls");
 
@@ -317,94 +440,124 @@ void editarLivro(LIVROS b)
     {
         i++;
     }
+    fclose(fp);
     if(i==0)
     {
         system("cls");
         gotoxy(34,2);
-        printf("NENHUM LIVRO CADASTRADO!\n");
+        printf("NENHUM LIVRO CADASTRADO!");
+        gotoxy(34,4);
     }
     else
     {
-        rewind(fp);
+        i=0;
 
         gotoxy(34,4);
         printf("DIGITE O CODIGO DO LIVRO PARA EDITAR:");
         scanf("%d", &d);
 
+        fp=fopen("Emprestimos.dat", "rb");
 
-        //BUSCA O LIVRO NO ARUIVO DE ACORDO COM SEU CODIGO.
-        while (fread(&b, sizeof(b),1,fp)==1)
+        while(fread(&c,sizeof(c),1,fp)==1)
         {
-            if(b.codLivro==d)
+            if(c.cod==d)
             {
-                system("cls");
-                gotoxy(34,5);
-                printf("NOME:%s", b.nomeLivro);
-                gotoxy(34,6);
-                printf("AUTOR:%s", b.nomeAutor);
-                gotoxy(34,8);
-                printf ("EDITAR LIVRO? S-SIM OU N-NAO");
-                c=getch();
-                c=toupper(c);
+                i++;
+            }
+        }
+        fclose(fp);
 
-                if (c=='S')
+        if(i>0)
+        {
+            system("cls");
+            gotoxy(34,4);
+            printf("EXEMPLAR EMPRESTADO, LIVRO NAO PODE SER EDITADO");
+            gotoxy(34,6);
+            system("pause");
+        }
+        else
+        {
+            fp=fopen("Livros.dat","ab+");
+            //BUSCA O LIVRO NO ARUIVO DE ACORDO COM SEU CODIGO.
+            while (fread(&b, sizeof(b),1,fp)==1)
+            {
+                if(b.codLivro==d)
                 {
                     system("cls");
                     gotoxy(34,5);
-                    printf("NOVO NOME:");
-                    setbuf(stdin,NULL);
-                    gets(b.nomeLivro);
-                    strupr(b.nomeLivro);
-                    setbuf(stdin,NULL);
+                    printf("NOME:%s", b.nomeLivro);
+                    gotoxy(34,6);
+                    printf("AUTOR:%s", b.nomeAutor);
+                    gotoxy(34,8);
+                    printf ("EDITAR LIVRO? S-SIM OU N-NAO");
+                    o=getch();
+                    o=toupper(o);
 
-                    gotoxy(34,7);
-                    printf("NOME DO AUTOR:");
-                    gets(b.nomeAutor);
-                    strupr(b.nomeAutor);
-                    setbuf(stdin, NULL);
+                    if (o=='S')
+                    {
+                        system("cls");
+                        gotoxy(34,5);
+                        printf("NOVO NOME:");
+                        setbuf(stdin,NULL);
+                        gets(b.nomeLivro);
+                        strupr(b.nomeLivro);
+                        setbuf(stdin,NULL);
 
-                    gotoxy(34,9);
-                    printf("AREA DO LIVRO:");
-                    gets(b.area);
-                    strupr(b.area);
-                    setbuf(stdin, NULL);
+                        gotoxy(34,7);
+                        printf("NOME DO AUTOR:");
+                        gets(b.nomeAutor);
+                        strupr(b.nomeAutor);
+                        setbuf(stdin, NULL);
 
-                    gotoxy(34,11);
-                    printf("QUANTIDADE:");
-                    scanf("%d", &b.qtda);
+                        gotoxy(34,9);
+                        printf("AREA DO LIVRO:");
+                        gets(b.area);
+                        strupr(b.area);
+                        setbuf(stdin, NULL);
 
-                    gotoxy(34,13);
-                    printf("LIVRO EDITADO!");
-                    fseek(fp,ftell(fp)-sizeof(b),0);
-                    fwrite(&b,sizeof(b),1,fp);
-                    fclose(fp);
-                    gotoxy(34,15);
-                    system("pause");
+                        gotoxy(34,11);
+                        printf("QUANTIDADE:");
+                        scanf("%d", &b.qtda);
+
+                        gotoxy(34,13);
+                        printf("LIVRO EDITADO!");
+                        fseek(fp,ftell(fp)-sizeof(b),0);
+                        fwrite(&b,sizeof(b),1,fp);
+                        fclose(fp);
+                        gotoxy(34,15);
+                        system("pause");
+                    }
                 }
             }
         }
     }
     system("cls");
-    gotoxy(34,5);
-    printf ("EDITAR OUTRO? S-SIM OU N-NAO");
-    c=getch();
-    c=toupper(c);
-
-    if (c=='S')
+    do
     {
-        editarLivro(b);
+        gotoxy(52,2);
+        printf("EDICAO DE LIVROS:");
+        gotoxy(34,5);
+        printf ("EDITAR OUTRO? S-SIM OU N-NAO");
+        o=getch();
+        o=toupper(o);
+
+        if (o=='S')
+        {
+            editarLivro(b,c);
+        }
     }
+    while(o!='N');
 }
 
 //FUNCAO QUE REMOVE O LIVRO.
-void removerLivro(LIVROS b)
+void removerLivro(LIVROS b, EMPRESTIMOS c)
 {
     int d, i=0;
-    char c;
+    char o;
 
     system("cls");
     gotoxy(52,2);
-    printf("REMOVER LIVRO\n");
+    printf("REMOVER LIVRO:");
 
     fp=fopen("Livros.dat", "rb+");
     rewind(fp);
@@ -416,68 +569,99 @@ void removerLivro(LIVROS b)
     {
         system("cls");
         gotoxy(34,2);
-        printf("NENHUM LIVRO CADASTRADO!\n");
+        printf("NENHUM LIVRO CADASTRADO!");
+        gotoxy(34,4);
     }
     else
     {
         rewind(fp);
         gotoxy(34,4);
-        printf("DIGITE CODIGO DO LIVRO PARA REMOVER:\n");
+        printf("DIGITE CODIGO DO LIVRO PARA REMOVER:");
         scanf("%d", &d);
-        //BUSCA O LIVRO DE ACORDO COM O CODIGO.
-        while(fread(&b,sizeof(b),1,fp)==1)
-        {
-            if (d==b.codLivro)
-            {
-                gotoxy(34,6);
-                printf("NOME: %s\n", b.nomeLivro);
-                gotoxy(34,7);
-                printf("CODIGO: %d\n", b.codLivro);
-                gotoxy(34,8);
-                printf("AUTOR:%s\n", b.nomeAutor);
-                gotoxy(34,9);
-                printf("AREA: %s\n", b.area);
-                gotoxy(34,10);
-                printf("QUANTIDADE: %d\n", b.qtda);
-                gotoxy(34,12);
-                printf("DELETAR? S-SIM OU N-NAO");
-                c=getch();
-                c=toupper(c);
-            }
 
-            if (c=='S')
+        fp=fopen("Emprestimos.dat", "rb");
+
+        while(fread(&c,sizeof(c),1,fp)==1)
+        {
+            if(c.cod==d)
             {
-                fs=fopen("remove.dat", "wb+");
-                rewind(fp);
-                while(fread(&b,sizeof(b),1,fp)==1)
+                i++;
+            }
+        }
+        fclose(fp);
+
+        if(i>0)
+        {
+            system("cls");
+            gotoxy(34,4);
+            printf("EXEMPLAR EMPRESTADO, LIVRO NAO PODE SER REMOVIDO");
+            gotoxy(34,6);
+            system("pause");
+        }
+        else
+        {
+            fp=fopen("Livros.dat","ab+");
+            //BUSCA O LIVRO DE ACORDO COM O CODIGO.
+            while(fread(&b,sizeof(b),1,fp)==1)
+            {
+                if (d==b.codLivro)
                 {
-                    if(b.codLivro!=d)
-                    {
-                        fseek(fs,0,SEEK_CUR);
-                        fwrite(&b,sizeof(b),1,fs);
-                    }
+                    gotoxy(34,6);
+                    printf("NOME: %s", b.nomeLivro);
+                    gotoxy(34,7);
+                    printf("CODIGO: %d", b.codLivro);
+                    gotoxy(34,8);
+                    printf("AUTOR:%s", b.nomeAutor);
+                    gotoxy(34,9);
+                    printf("AREA: %s", b.area);
+                    gotoxy(34,10);
+                    printf("QUANTIDADE: %d", b.qtda);
+                    gotoxy(34,12);
+                    printf("DELETAR? S-SIM OU N-NAO");
+                    o=getch();
+                    o=toupper(o);
                 }
-                fclose(fs);
-                fclose(fp);
-                remove("Livros.dat");
-                rename("remove.dat","Livros.dat");
-                gotoxy(34,14);
-                printf("LIVRO REMOVIDO!");
-                gotoxy(34,16);
-                system("pause");
+
+                if (o=='S')
+                {
+                    fs=fopen("remove.dat", "wb+");
+                    rewind(fp);
+                    while(fread(&b,sizeof(b),1,fp)==1)
+                    {
+                        if(b.codLivro!=d)
+                        {
+                            fseek(fs,0,SEEK_CUR);
+                            fwrite(&b,sizeof(b),1,fs);
+                        }
+                    }
+                    fclose(fs);
+                    fclose(fp);
+                    remove("Livros.dat");
+                    rename("remove.dat","Livros.dat");
+                    gotoxy(34,14);
+                    printf("LIVRO REMOVIDO!");
+                    gotoxy(34,16);
+                    system("pause");
+                }
             }
         }
     }
     system("cls");
-    gotoxy(34,5);
-    printf ("REMOVER OUTRO? (S) PARA SIM (N) PARA NAO");
-    c=getch();
-    c=toupper(c);
-
-    if (c=='S')
+    do
     {
-        removerLivro(b);
+        gotoxy(52,2);
+        printf("REMOVER LIVRO:");
+        gotoxy(34,5);
+        printf ("REMOVER OUTRO? S-SIM OU N-NAO");
+        o=getch();
+        o=toupper(o);
+
+        if (o=='S')
+        {
+            removerLivro(b,c);
+        }
     }
+    while(o!='N');
 }
 
 //FUNCAO QUE LISTA TODOS OS LIVROS CADASTRADOS.
@@ -505,7 +689,7 @@ void listarLivro(LIVROS b)
         rewind(fp);
         i=0;
         gotoxy(52,2);
-        printf("LIVROS DISPONIVEIS");
+        printf("LIVROS CADASTRADOS");
         gotoxy(1,4);
         printf("NOME:");
         gotoxy(31,4);
@@ -548,7 +732,7 @@ void cadastroAluno(ALUNOS a)
     fp=fopen("Alunos.dat", "ab+");
     system("cls");
     gotoxy(52,2);
-    printf("CADASTRO DE ALUNOS\n");
+    printf("CADASTRO DE ALUNOS");
     setbuf(stdin, NULL);
     gotoxy(34,4);
     printf("DIGITE NOME DO ALUNO:");
@@ -569,128 +753,170 @@ void cadastroAluno(ALUNOS a)
     fclose(fp);
     gotoxy(34,8);
     printf("O ALUNO FOI CADASTRADO CORRETAMENTE!");
-    gotoxy(34,10);
-    printf ("CADASTRAR OUTRO? S-SIM OU N-NAO.");
-    gotoxy(49,19);
-    c=getch();
-    c=toupper(c);
-    setbuf(stdin, NULL);
-
-    if (c=='S')
+    system("cls");
+    do
     {
-        cadastroAluno(a);
+        gotoxy(52,2);
+        printf("CADASTRO DE ALUNOS");
+        gotoxy(34,4);
+        printf ("CADASTRAR OUTRO? S-SIM OU N-NAO.");
+        gotoxy(49,19);
+        c=getch();
+        c=toupper(c);
+        setbuf(stdin, NULL);
+
+        if (c=='S')
+        {
+            cadastroAluno(a);
+        }
     }
+    while(c!='N');
 }
 
 //EDITA ALUNOS CADASTRADOS.
-void editarAluno(ALUNOS a)
+void editarAluno(ALUNOS a, EMPRESTIMOS c)
 {
-    char c, d[15];
+    char o, d[15];
     int i=0;
 
     system("cls");
     gotoxy(52,2);
-    printf("EDICAO DE ALUNOS:\n");
-    fp=fopen("Alunos.dat", "rb+");
+    printf("EDICAO DE ALUNOS:");
+    fp=fopen("Alunos.dat", "rb");
     rewind(fp);
 
     while(fread(&a,sizeof(a),1,fp)==1)
     {
         i++;
     }
+    fclose(fp);
+
     if(i==0)
     {
         system("cls");
         gotoxy(34,5);
-        printf("NENHUM ALUNO MATRICULADO!\n");
+        printf("NENHUM ALUNO MATRICULADO!");
+        gotoxy(34,7);
     }
     else
     {
         rewind(fp);
         gotoxy(34,4);
         printf("DIGITE MATRICULA DO ALUNO QUE DESEJA EDITAR:");
+        setbuf(stdin, NULL);
         gets(d);
         setbuf(stdin, NULL);
 
-        //BUSCA O ALUNO NO ARQUIVO DE ACORDO COM A MATTRICULA.
-        while (fread(&a, sizeof(a),1,fp)==1)
-        {
-            if(strcmp(d,a.matricula)==0)
-            {
-                gotoxy(34,6);
-                printf("NOME:%s\n", a.nomeAluno);
-                gotoxy(34,7);
-                printf("CPF:%s\n", a.cpf);
-                gotoxy(34,9);
-                printf ("EDITAR ALUNO? S-SIM OU N-NAO");
-                c=getch();
-                c=toupper(c);
+        fp=fopen("Emprestimos.dat", "rb");
 
-                if (c=='S')
+        while(fread(&c,sizeof(c),1,fp)==1)
+        {
+            if(strcmp(d,c.mat)==0)
+            {
+                i++;
+            }
+        }
+        fclose(fp);
+
+        if(i>0)
+        {
+            system("cls");
+            gotoxy(34,4);
+            printf("EMPRESTIMO PENDENTE, ALUNO NAO PODE SER EDITADO");
+            gotoxy(34,6);
+            system("pause");
+        }
+        else
+        {
+            fp=fopen("Alunos.dat","ab+");
+            //BUSCA O ALUNO NO ARQUIVO DE ACORDO COM A MATTRICULA.
+            while (fread(&a, sizeof(a),1,fp)==1)
+            {
+                if(strcmp(d,a.matricula)==0)
+                {
+                    gotoxy(34,6);
+                    printf("NOME:%s", a.nomeAluno);
+                    gotoxy(34,7);
+                    printf("CPF:%s", a.cpf);
+                    gotoxy(34,9);
+                    printf ("EDITAR ALUNO? S-SIM OU N-NAO");
+                    o=getch();
+                    o=toupper(o);
+
+                    if (o=='S')
+                    {
+                        system("cls");
+                        setbuf(stdin, NULL);
+                        gotoxy(34,5);
+                        printf("NOVO NOME:");
+                        gets(a.nomeAluno);
+                        strupr(a.nomeAluno);
+                        setbuf(stdin,NULL);
+                        gotoxy(34,6);
+                        printf("MATRICULA:");
+                        gets(a.matricula);
+                        setbuf(stdin, NULL);
+                        gotoxy(34,7);
+                        printf("CPF:");
+                        gets(a.cpf);
+                        setbuf(stdin, NULL);
+
+                        fseek(fp,ftell(fp)-sizeof(a),0);
+                        fwrite(&a,sizeof(a),1,fp);
+                        fclose(fp);
+                        gotoxy(34,9);
+                        printf("CADASTRO DO ALUNO FOI EDITADO COM SUCESSO!");
+                        gotoxy(34,11);
+                        system("pause");
+                        gotoxy(49,19);
+                    }
+                }
+                if(strcmp(d,a.matricula)!=0)
                 {
                     system("cls");
-                    setbuf(stdin, NULL);
                     gotoxy(34,5);
-                    printf("NOVO NOME:");
-                    gets(a.nomeAluno);
-                    strupr(a.nomeAluno);
-                    setbuf(stdin,NULL);
-                    gotoxy(34,6);
-                    printf("MATRICULA:");
-                    gets(a.matricula);
-                    setbuf(stdin, NULL);
-                    gotoxy(34,7);
-                    printf("CPF:");
-                    gets(a.cpf);
-                    setbuf(stdin, NULL);
-
-                    fseek(fp,ftell(fp)-sizeof(a),0);
-                    fwrite(&a,sizeof(a),1,fp);
-                    fclose(fp);
-                    gotoxy(34,9);
-                    printf("CADASTRO DO ALUNO FOI EDITADO COM SUCESSO!");
-                    gotoxy(34,11);
-                    system("pause");
-                    gotoxy(49,19);
+                    printf("ALUNO NAO CADASTRADO!");
                 }
-            }
-            if(strcmp(d,a.matricula)!=0)
-            {
-                system("cls");
-                gotoxy(34,5);
-                printf("ALUNO NAO CADASTRADO!");
             }
         }
     }
     system("cls");
-    gotoxy(34,5);
-    printf ("EDITAR OUTRO? S-SIM OU N-NAO.");
-    c=getch();
-    c=toupper(c);
-
-    if (c=='S')
+    do
     {
-        editarAluno(a);
+        gotoxy(52,2);
+        printf("EDICAO DE ALUNOS:");
+        gotoxy(34,4);
+        printf ("EDITAR OUTRO? S-SIM OU N-NAO.");
+        o=getch();
+        o=toupper(o);
+
+        if (o=='S')
+        {
+            editarAluno(a,c);
+        }
     }
+    while(o!='N');
 }
 
 //FUNCAO QUE REMOVE O ALUNO CADASTRADO.
-void removerAluno(ALUNOS a)
+void removerAluno(ALUNOS a, EMPRESTIMOS c)
 {
-    char c, d[15];
+    char o, d[15];
     int i=0;
 
     system("cls");
     gotoxy(52,2);
     printf("REMOVER ALUNO\n");
 
-    fp=fopen("Alunos.dat", "rb+");
+    fp=fopen("Alunos.dat", "rb");
     rewind(fp);
 
     while(fread(&a,sizeof(a),1,fp)==1)
     {
         i++;
     }
+    fclose(fp);
+
     if(i==0)
     {
         system("cls");
@@ -699,62 +925,89 @@ void removerAluno(ALUNOS a)
     }
     else
     {
-        rewind(fp);
         gotoxy(34,4);
         printf("DIGITE MATRICULA DO ALUNO QUE DESEJA REMOVER:");
         gets(d);
         setbuf(stdin, NULL);
-        //BUSCA O ALUNO PELA MATRICULA.
-        while(fread(&a,sizeof(a),1,fp)==1)
-        {
-            if (strcmp(d,a.matricula)==0)
-            {
-                gotoxy(34,6);
-                printf("NOME: %s\n", a.nomeAluno);
-                gotoxy(34,7);
-                printf("MATRICULA: %s\n", a.matricula);
-                gotoxy(34,8);
-                printf("CPF:%s\n", a.cpf);
-                gotoxy(34,10);
-                printf("DELETAR? S-SIM OU N-NAO.");
-                gotoxy(49,19);
-                c=getch();
-                c=toupper(c);
-            }
 
-            if (c=='S')
+        fp=fopen("Emprestimos.dat", "rb");
+
+        while(fread(&c,sizeof(c),1,fp)==1)
+        {
+            if(strcmp(d,c.mat)==0)
             {
-                fs=fopen("remove.dat", "wb+");
-                rewind(fp);
-                while(fread(&a,sizeof(a),1,fp)==1)
+                i++;
+            }
+        }
+        fclose(fp);
+
+        if(i>0)
+        {
+            system("cls");
+            gotoxy(34,4);
+            printf("EMPRESTIMO PEDENTE, ALUNO NAO PODE SER REMOVIDO");
+            gotoxy(34,6);
+            system("pause");
+        }
+        else
+        {
+            fp=fopen("Alunos.dat","ab+");
+            //BUSCA O ALUNO PELA MATRICULA.
+            while(fread(&a,sizeof(a),1,fp)==1)
+            {
+                if (strcmp(d,a.matricula)==0)
                 {
-                    if(strcmp(d,a.matricula)!=0)
-                    {
-                        fseek(fs,0,SEEK_CUR);
-                        fwrite(&a,sizeof(a),1,fs);
-                    }
+                    gotoxy(34,6);
+                    printf("NOME: %s\n", a.nomeAluno);
+                    gotoxy(34,7);
+                    printf("MATRICULA: %s\n", a.matricula);
+                    gotoxy(34,8);
+                    printf("CPF:%s\n", a.cpf);
+                    gotoxy(34,10);
+                    printf("DELETAR? S-SIM OU N-NAO.");
+                    gotoxy(49,19);
+                    o=getch();
+                    o=toupper(o);
                 }
-                fclose(fs);
-                fclose(fp);
-                remove("Alunos.dat");
-                rename("remove.dat","Alunos.dat");
-                gotoxy(34,12);
-                printf("CADASTRO DE ALUNO REMOVIDO!");
-                gotoxy(34,14);
-                system("pause");
+
+                if (o=='S')
+                {
+                    fs=fopen("remove.dat", "wb+");
+                    rewind(fp);
+                    while(fread(&a,sizeof(a),1,fp)==1)
+                    {
+                        if(strcmp(d,a.matricula)!=0)
+                        {
+                            fseek(fs,0,SEEK_CUR);
+                            fwrite(&a,sizeof(a),1,fs);
+                        }
+                    }
+                    fclose(fs);
+                    fclose(fp);
+                    remove("Alunos.dat");
+                    rename("remove.dat","Alunos.dat");
+                    gotoxy(34,12);
+                    printf("CADASTRO DE ALUNO REMOVIDO!");
+                    gotoxy(34,14);
+                    system("pause");
+                }
             }
         }
     }
     system("cls");
-    gotoxy(34,5);
-    printf ("REMOVER OUTRO? S-SIM N-NAO.");
-    c=getch();
-    c=toupper(c);
-
-    if (c=='S')
+    do
     {
-        removerAluno(a);
+        gotoxy(34,4);
+        printf ("REMOVER OUTRO? S-SIM N-NAO.");
+        o=getch();
+        o=toupper(o);
+
+        if (o=='S')
+        {
+            removerAluno(a,c);
+        }
     }
+    while(o!='N');
 }
 
 //LISTA TODOS OS ALUNOS CADASTRADOS.
@@ -798,7 +1051,6 @@ void listarAluno(ALUNOS a)
             printf("%s", a.cpf);
             gotoxy(25,j+2);
             j++;
-            i++;
         }
         fclose(fp);
     }
@@ -890,6 +1142,7 @@ void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c)
                     gotoxy(34,9);
                     n=b.qtda;
                     gotoxy(34,11);
+                    system("pause");
                 }
             }
             fclose(fp);
@@ -912,6 +1165,7 @@ void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c)
                 }
                 else
                 {
+                    i=0;
                     fp=fopen("Emprestimos.dat", "rb");
 
                     while(fread(&c, sizeof(c), 1, fp)==1)
@@ -932,44 +1186,50 @@ void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c)
                     }
                     else
                     {
-                    system("cls");
-                    gotoxy(34,4);
-                    printf("REALIZAR EMPRESTIMO? S-SIM OU N-NAO.");
-                    o=getch();
-                    o=toupper(o);
+                        system("cls");
+                        gotoxy(34,4);
+                        printf("REALIZAR EMPRESTIMO? S-SIM OU N-NAO.");
+                        o=getch();
+                        o=toupper(o);
 
-                    if(o=='S')
-                    {
-                        fp=fopen("Livros.dat","rb+");
-                        while(fread(&b,sizeof(b),1,fp)==1)
+                        if(o=='S')
                         {
-                            if(l==b.codLivro)
+                            fp=fopen("Livros.dat","rb+");
+                            while(fread(&b,sizeof(b),1,fp)==1)
                             {
-                                b.qtda=b.qtda-1;
-                                strcpy(c.livro,b.nomeLivro);
-                                fseek(fp,ftell(fp)-sizeof(b),0);
-                                fwrite (&b,sizeof(b),1,fp);
-                                fseek(fp,0,SEEK_END);
+                                if(l==b.codLivro)
+                                {
+                                    b.qtda=b.qtda-1;
+                                    strcpy(c.livro,b.nomeLivro);
+                                    fseek(fp,ftell(fp)-sizeof(b),0);
+                                    fwrite (&b,sizeof(b),1,fp);
+                                    fseek(fp,0,SEEK_END);
 
+                                }
                             }
-                        }
-                        fclose(fp);
+                            fclose(fp);
 
-                        fp=fopen("Emprestimos.dat","ab+");
-                        strcpy(c.mat,m);
-                        strcpy(c.aluno,al);
-                        strcpy(c.aluno, a.nomeAluno);
-                        c.cod=l;
-                        fwrite(&c,sizeof(c),1,fp);
-                        fclose(fp);
-                        gotoxy(34,6);
-                        printf("EMPRESTIMO REALIZADO!");
-                        gotoxy(34,8);
+                            fp=fopen("Emprestimos.dat","ab+");
+                            strcpy(c.mat,m);
+                            strcpy(c.aluno,al);
+                            strcpy(c.aluno, a.nomeAluno);
+                            c.cod=l;
+                            sprintf(c.dataAtual,"%s",data());
+                            sprintf(c.dataDevolucao,"%s",dataDevolucao());
+                            fwrite(&c,sizeof(c),1,fp);
+                            fclose(fp);
+                            gotoxy(34,6);
+                            printf("EMPRESTIMO REALIZADO!");
+                            gotoxy(34,8);
+                            printf("DATA: %s",c.dataAtual);
+                            gotoxy(34,10);
+                            printf("DEVOLUCAO: %s",c.dataDevolucao);
+                            gotoxy(34,12);
+                        }
                     }
                 }
             }
         }
-    }
     }
     system("pause");
 }
@@ -1021,7 +1281,7 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
                 gotoxy(34,8);
                 printf("MATRICULA: %s", c.mat);
                 gotoxy(34,9);
-                printf("NOME DO LIVRO:%s", c.livro);
+                printf("NOME DO LIVRO: %s", c.livro);
                 gotoxy(34,10);
                 printf("CODIGO: %d", c.cod);
 
@@ -1039,7 +1299,6 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
                 {
                     if(d!=c.cod || strcmp(m,c.mat)!=0)
                     {
-                       // fseek(fs,0,SEEK_CUR);
                         fwrite(&c,sizeof(c),1,fs);
                         setbuf(stdin, NULL);
                     }
@@ -1083,6 +1342,7 @@ void listarTodosEmprestimo(EMPRESTIMOS c)
         i++;
     }
     fclose(fp);
+
     if(i==0)
     {
         gotoxy(34,4);
@@ -1094,26 +1354,33 @@ void listarTodosEmprestimo(EMPRESTIMOS c)
         fp=fopen("Emprestimos.dat","rb");
         gotoxy(45,2);
         printf("EMPRESTIMOS CADASTRADOS");
-        gotoxy(15,4);
+        gotoxy(1,4);
         printf("NOME ALUNO:");
-        gotoxy(45,4);
+        gotoxy(25,4);
         printf("MATRICULA:");
-        gotoxy(60,4);
+        gotoxy(40,4);
         printf("NOME LIVRO:");
-        gotoxy(90,4);
+        gotoxy(60,4);
         printf("CODIGO LIVRO:");
+        gotoxy(80,4);
+        printf("DATA EMPRESTIMO:");
+        gotoxy(100,4);
+        printf("DATA DEVOLUCAO:");
         while(fread(&c,sizeof(c),1,fp)==1)
         {
-            gotoxy(15,j);
+            gotoxy(1,j);
             printf("%s", c.aluno);
-            gotoxy(45,j);
+            gotoxy(25,j);
             printf("%s", c.mat);
-            gotoxy(60,j);
+            gotoxy(40,j);
             printf("%s", c.livro);
-            gotoxy(90,j);
+            gotoxy(60,j);
             printf("%d", c.cod);
-            gotoxy(15,j+2);
-            i++;
+            gotoxy(80,j);
+            printf("%s", c.dataAtual);
+            gotoxy(100,j);
+            printf("%s", c.dataDevolucao);
+            gotoxy(1,j+2);
             j++;
         }
         fclose(fp);
@@ -1148,27 +1415,34 @@ void listarEmprestimoLivro(EMPRESTIMOS c)
 
         gotoxy(45,2);
         printf("EMPRESTIMOS CADASTRADOS");
-        gotoxy(15,4);
+        gotoxy(1,4);
         printf("NOME ALUNO:");
-        gotoxy(45,4);
+        gotoxy(25,4);
         printf("MATRICULA:");
-        gotoxy(60,4);
+        gotoxy(40,4);
         printf("NOME LIVRO:");
-        gotoxy(90,4);
+        gotoxy(60,4);
         printf("CODIGO LIVRO:");
+        gotoxy(80,4);
+        printf("DATA EMPRESTIMO:");
+        gotoxy(100,4);
+        printf("DATA DEVOLUCAO:");
         while(fread(&c,sizeof(c),1,fp)==1)
         {
             if(d==c.cod)
             {
-                gotoxy(15,j);
+                gotoxy(1,j);
                 printf("%s", c.aluno);
-                gotoxy(45,j);
+                gotoxy(25,j);
                 printf("%s", c.mat);
-                gotoxy(60,j);
+                gotoxy(40,j);
                 printf("%s", c.livro);
-                gotoxy(90,j);
+                gotoxy(60,j);
                 printf("%d", c.cod);
-                i++;
+                gotoxy(80,j);
+                printf("%s", c.dataAtual);
+                gotoxy(100,j);
+                printf("%s", c.dataDevolucao);
                 j++;
                 gotoxy(15,j+2);
             }
@@ -1204,27 +1478,37 @@ void listarEmprestimoAluno(EMPRESTIMOS c)
         gets(m);
         setbuf(stdin, NULL);
 
-        gotoxy(15,4);
+        gotoxy(45,2);
+        printf("EMPRESTIMOS CADASTRADOS");
+        gotoxy(1,4);
         printf("NOME ALUNO:");
-        gotoxy(45,4);
+        gotoxy(25,4);
         printf("MATRICULA:");
-        gotoxy(60,4);
+        gotoxy(40,4);
         printf("NOME LIVRO:");
-        gotoxy(90,4);
+        gotoxy(60,4);
         printf("CODIGO LIVRO:");
+        gotoxy(80,4);
+        printf("DATA EMPRESTIMO:");
+        gotoxy(100,4);
+        printf("DATA DEVOLUCAO:");
         while(fread(&c,sizeof(c),1,fp)==1)
         {
             if(strcmp(c.mat,m)==0)
             {
-                gotoxy(15,j);
-                printf("%s\t", c.aluno);
-                gotoxy(45,j);
-                printf("%s\t", c.mat);
+                gotoxy(1,j);
+                printf("%s", c.aluno);
+                gotoxy(25,j);
+                printf("%s", c.mat);
+                gotoxy(40,j);
+                printf("%s", c.livro);
                 gotoxy(60,j);
-                printf("%s\t", c.livro);
-                gotoxy(90,j);
-                printf("%d\n", c.cod);
-                i++;
+                printf("%d", c.cod);
+                gotoxy(80,j);
+                printf("%s", c.dataAtual);
+                gotoxy(100,j);
+                printf("%s", c.dataDevolucao);
+                j++;
                 gotoxy(15,j+2);
             }
         }
@@ -1233,9 +1517,78 @@ void listarEmprestimoAluno(EMPRESTIMOS c)
     system("pause");
 }
 
-void debitos()
+void debitos(EMPRESTIMOS c)
 {
+    char atual[15];
+    int j=5, i=0;
 
+    fp=fopen("Emprestimos.dat", "rb");
+    fs=fopen("Debitos.dat", "ab+");
+    system("cls");
+
+    sprintf(atual,"%s",data());
+
+    while(fread(&c,sizeof(c),1,fp)==1)
+    {
+        if(strcmp(atual,c.dataDevolucao)>0)
+        {
+            i++;
+        }
+    }
+    if(i==0)
+    {
+        gotoxy(34,4);
+        printf("NENHUM DEBITO ENCONTRADO!");
+        gotoxy(34,6);
+    }
+    else
+    {
+        rewind(fp);
+        while(fread(&c,sizeof(c),1,fp)==1)
+        {
+            if(strcmp(atual,c.dataDevolucao)>0)
+            {
+                strcpy(c.dataAtual,atual);
+                fwrite(&c,sizeof(c),1,fs);
+            }
+        }
+        fclose(fp);
+
+        rewind(fs);
+        gotoxy(45,2);
+        printf("DEBITOS");
+        gotoxy(1,4);
+        printf("NOME ALUNO:");
+        gotoxy(25,4);
+        printf("MATRICULA:");
+        gotoxy(40,4);
+        printf("NOME LIVRO:");
+        gotoxy(60,4);
+        printf("CODIGO LIVRO:");
+        gotoxy(80,4);
+        printf("DATA DEVOLUCAO:");
+        gotoxy(100,4);
+        printf("DATA ATUAL:");
+        while(fread(&c,sizeof(c),1,fp)==1)
+        {
+            gotoxy(1,j);
+            printf("%s", c.aluno);
+            gotoxy(25,j);
+            printf("%s", c.mat);
+            gotoxy(40,j);
+            printf("%s", c.livro);
+            gotoxy(60,j);
+            printf("%d", c.cod);
+            gotoxy(80,j);
+            printf("%s", c.dataAtual);
+            gotoxy(100,j);
+            printf("%s", c.dataDevolucao);
+            gotoxy(15,j+2);
+            j++;
+        }
+        fclose(fs);
+    }
+    system("pause");
 }
 
 main()
@@ -1263,10 +1616,10 @@ main()
                     cadastroLivro(b);
                     break;
                 case '2':
-                    editarLivro(b);
+                    editarLivro(b,c);
                     break;
                 case '3':
-                    removerLivro(b);
+                    removerLivro(b,c);
                     break;
                 case '4':
                     listarLivro(b);
@@ -1289,10 +1642,10 @@ main()
                     cadastroAluno(a);
                     break;
                 case '2':
-                    editarAluno(a);
+                    editarAluno(a,c);
                     break;
                 case '3':
-                    removerAluno(a);
+                    removerAluno(a,c);
                     break;
                 case '4':
                     listarAluno(a);
@@ -1341,7 +1694,7 @@ main()
             break;
 
         case '4':
-            debitos();
+            debitos(c);
             break;
         }
     }
