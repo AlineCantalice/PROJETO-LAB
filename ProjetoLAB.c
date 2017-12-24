@@ -243,16 +243,14 @@ void menuPrincipal ()
     printf("MENU PRINCIPAL");
     linhaMeio();
     linhaLateral();
-    gotoxy(36,8);
+    gotoxy(36,9);
     printf("1. ACERVO");
-    gotoxy(36,10);
+    gotoxy(36,11);
     printf("2. ALUNOS");
-    gotoxy(36,12);
+    gotoxy(36,13);
     printf("3. EMPRESTIMOS");
-    gotoxy(36,14);
-    printf("4. DEBITOS DE DEVOLUCAO");
-    gotoxy(36,16);
-    printf("5. SAIR");
+    gotoxy(36,15);
+    printf("4. SAIR");
     linhaInferior();
     gotoxy(34,20);
     printf("Por Favor escolha uma das opcoes acima...");
@@ -694,7 +692,6 @@ void listarLivro(LIVROS b)
         gotoxy(34,2);
         printf("NENHUM LIVRO CADASTRADO!");
         gotoxy(34,4);
-        system("pause");
     }
     //SE EXISTIR ALGUM...
     else
@@ -1042,7 +1039,6 @@ void listarAluno(ALUNOS a)
         gotoxy(34,4);
         printf("NENHUM ALUNO CADASTRADO!\n");
         gotoxy(34,6);
-        system("pause");
     }
     else
     {
@@ -1551,82 +1547,6 @@ void listarEmprestimoAluno(EMPRESTIMOS c)
     }
     system("pause");
 }
-//FUNCAO QUE ARMAZENA OS EMPRESTIMOS DE ALUNOS QUE ATRASARAM NA DEVOLUCAO
-void debitos(EMPRESTIMOS c)
-{
-    char atual[15];
-    int j=5, i=0;
-    //ABRE OS ARQUIVOS DE EMPRESTIMO E DEBITOS
-    fp=fopen("Emprestimos.dat", "rb");
-    fs=fopen("Debitos.dat", "wb+");
-    system("cls");
-    //RECEBE A DATA ATUAL DO SISTEMA
-    sprintf(atual,"%s",data());
-
-    while(fread(&c,sizeof(c),1,fp)==1)
-    {
-        //COMPARA A DATA ATUAL COM A DA DEVOLUCAO
-        if(strcmp(atual,c.dataDevolucao)>0)
-        {
-            i++;
-        }
-    }
-    if(i==0)
-    {
-        gotoxy(34,4);
-        printf("NENHUM DEBITO ENCONTRADO!");
-        gotoxy(34,6);
-    }
-    else
-    {
-        rewind(fp);
-        //SE A DATA ATUAL FOR MAIOR QUE A DATA DE DEVOLUCAO ESCREVE NO ARQUIVO DE DEBITOS
-        while(fread(&c,sizeof(c),1,fp)==1)
-        {
-            if(strcmp(atual,c.dataDevolucao)>0)
-            {
-                strcpy(c.dataAtual,atual);
-                fwrite(&c,sizeof(c),1,fs);
-            }
-        }
-        fclose(fp);
-        //LISTA TODOS OS DEBITOS ENCONTRADOS
-        rewind(fs);
-        gotoxy(45,2);
-        printf("DEBITOS");
-        gotoxy(1,4);
-        printf("NOME ALUNO:");
-        gotoxy(25,4);
-        printf("MATRICULA:");
-        gotoxy(40,4);
-        printf("NOME LIVRO:");
-        gotoxy(60,4);
-        printf("CODIGO LIVRO:");
-        gotoxy(80,4);
-        printf("DATA DEVOLUCAO:");
-        gotoxy(100,4);
-        printf("DATA ATUAL:");
-        while(fread(&c,sizeof(c),1,fs)==1)
-        {
-            gotoxy(1,j);
-            printf("%s", c.aluno);
-            gotoxy(25,j);
-            printf("%s", c.mat);
-            gotoxy(40,j);
-            printf("%s", c.livro);
-            gotoxy(60,j);
-            printf("%d", c.cod);
-            gotoxy(80,j);
-            printf("%s", c.dataDevolucao);
-            gotoxy(100,j);
-            printf("%s", c.dataAtual);
-            gotoxy(1,j+2);
-            j++;
-        }
-        fclose(fs);
-    }
-    system("pause");
-}
 
 main()
 {
@@ -1729,13 +1649,9 @@ main()
             }
             while(opt!='4');
             break;
-
-        case '4':
-            debitos(c);
-            break;
         }
     }
-    while (mopt!='5');
+    while (mopt!='4');
     system("cls");
     fim();
 }
