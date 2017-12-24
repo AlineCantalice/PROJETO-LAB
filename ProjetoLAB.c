@@ -1094,14 +1094,15 @@ void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c)
     {
         if (strcmp(m,a.matricula)==0)
         {
+            i++;
             gotoxy(34,6);
             printf("NOME: %s", a.nomeAluno);
             gotoxy(34,7);
             printf("MATRICULA:%s", a.matricula);
             gotoxy(34,8);
             printf("CPF: %s", a.cpf);
-            i++;
             gotoxy(34,10);
+            strcpy(al,a.nomeAluno);
             system("pause");
         }
     }
@@ -1185,7 +1186,7 @@ void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c)
                     //BUSCA PELA MATRICULA DO ALUNO SE ELE JA TEM ESSE EXEMPLAR DO LIVRO
                     while(fread(&c, sizeof(c), 1, fp)==1)
                     {
-                        if(l==b.codLivro && strcmp(m,a.matricula)==0)
+                        if(l==c.cod && strcmp(m,c.mat)==0)
                         {
                             i++;
                         }
@@ -1227,8 +1228,7 @@ void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c)
 
                             fp=fopen("Emprestimos.dat","ab+");
                             strcpy(c.mat,m);
-                            strcpy(c.aluno,al);
-                            strcpy(c.aluno, a.nomeAluno);
+                            strcpy(c.aluno, al);
                             c.cod=l;
                             //PEGA A DATA DO SISTEMA E CALCULA A DATA DE DEVOLUCAO
                             sprintf(c.dataAtual,"%s",data());
@@ -1445,6 +1445,7 @@ void listarEmprestimoLivro(EMPRESTIMOS c)
         scanf("%d", &d);
         rewind(fp);
 
+        system("cls");
         gotoxy(45,2);
         printf("EMPRESTIMOS CADASTRADOS");
         gotoxy(1,4);
@@ -1476,7 +1477,7 @@ void listarEmprestimoLivro(EMPRESTIMOS c)
                 gotoxy(100,j);
                 printf("%s", c.dataDevolucao);
                 j++;
-                gotoxy(15,j+2);
+                gotoxy(1,j+2);
             }
         }
         fclose(fp);
@@ -1507,9 +1508,11 @@ void listarEmprestimoAluno(EMPRESTIMOS c)
         rewind(fp);
         gotoxy(34,4);
         printf("DIGITE MATRICULA DO ALUNO:");
+        setbuf(stdin, NULL);
         gets(m);
         setbuf(stdin, NULL);
 
+        system("cls");
         gotoxy(45,2);
         printf("EMPRESTIMOS CADASTRADOS");
         gotoxy(1,4);
@@ -1541,7 +1544,7 @@ void listarEmprestimoAluno(EMPRESTIMOS c)
                 gotoxy(100,j);
                 printf("%s", c.dataDevolucao);
                 j++;
-                gotoxy(15,j+2);
+                gotoxy(1,j+2);
             }
         }
         fclose(fp);
