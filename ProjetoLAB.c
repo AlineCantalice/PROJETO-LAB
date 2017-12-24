@@ -181,7 +181,7 @@ char *dataDevolucao(void)
     mes = local -> tm_mon + 1;
     ano = local -> tm_year + 1900;
 
-    dia = dia + 1;
+    dia = dia + 10;
 
     if(mes == 2)
     {
@@ -1261,6 +1261,7 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
     }
     else
     {
+        i=0;
         gotoxy(34,4);
         printf("DIGITE CODIGO DO LIVRO: ");
         scanf("%d", &d);
@@ -1276,6 +1277,7 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
         {
             if (d==c.cod && strcmp(m,c.mat)==0)
             {
+                i++;
                 gotoxy(34,7);
                 printf("NOME DO ALUNO: %s", c.aluno);
                 gotoxy(34,8);
@@ -1284,15 +1286,26 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
                 printf("NOME DO LIVRO: %s", c.livro);
                 gotoxy(34,10);
                 printf("CODIGO: %d", c.cod);
-
-                gotoxy(34,12);
-                printf("CONFIRMAR? S-SIM OU N-NAO.");
-                o=getch();
-                o=toupper(o);
             }
+        }
+        fclose(fp);
+        if(i==0)
+        {
+            system("cls");
+            gotoxy(34,4);
+            printf("DADOS DE EMPRESTIMO NAO ENCONTRADOS");
+            gotoxy(34,6);
+        }
+        else
+        {
+            gotoxy(34,12);
+            printf("CONFIRMAR DEVOLUCAO? S-SIM OU N-NAO.");
+            o=getch();
+            o=toupper(o);
 
             if (o=='S')
             {
+                fp=fopen("Emprestimos.dat", "rb+");
                 fs=fopen("remove.dat", "wb+");
                 rewind(fp);
                 while(fread(&c,sizeof(c),1,fp)==1)
@@ -1523,7 +1536,7 @@ void debitos(EMPRESTIMOS c)
     int j=5, i=0;
 
     fp=fopen("Emprestimos.dat", "rb");
-    fs=fopen("Debitos.dat", "ab+");
+    fs=fopen("Debitos.dat", "wb+");
     system("cls");
 
     sprintf(atual,"%s",data());
@@ -1569,7 +1582,7 @@ void debitos(EMPRESTIMOS c)
         printf("DATA DEVOLUCAO:");
         gotoxy(100,4);
         printf("DATA ATUAL:");
-        while(fread(&c,sizeof(c),1,fp)==1)
+        while(fread(&c,sizeof(c),1,fs)==1)
         {
             gotoxy(1,j);
             printf("%s", c.aluno);
@@ -1580,10 +1593,10 @@ void debitos(EMPRESTIMOS c)
             gotoxy(60,j);
             printf("%d", c.cod);
             gotoxy(80,j);
-            printf("%s", c.dataAtual);
-            gotoxy(100,j);
             printf("%s", c.dataDevolucao);
-            gotoxy(15,j+2);
+            gotoxy(100,j);
+            printf("%s", c.dataAtual);
+            gotoxy(1,j+2);
             j++;
         }
         fclose(fs);
