@@ -363,7 +363,6 @@ void cadastroLivro(LIVROS b)
 
     //ABRE O ARQUIVO DE LIVROS
     fp=fopen("Livros.dat", "rb+");
-    //fclose(fp);
     //CADASTRO DO LIVRO.
     gotoxy(34,4);
     printf("DIGITE NOME DO LIVRO:");
@@ -371,7 +370,7 @@ void cadastroLivro(LIVROS b)
     gets(nomeL);
     strupr(nomeL);
     setbuf(stdin, NULL);
-
+    rewind(fp);
     while(fread(&b,sizeof(b),1,fp)==1)
     {
         if(strcmp(nomeL,b.nomeLivro)==0)
@@ -389,9 +388,11 @@ void cadastroLivro(LIVROS b)
     //GERA-SE O CODIGO, DEVE VIR ANTES DO CADASTRO.
     fseek (fp,ftell(fp)-sizeof(b),SEEK_END);
 
-    if (fread(&b,sizeof(b),1,fp)!=1)
+    if (fread(&b,sizeof(b),1,fp)==0)
     {
-        b.codLivro= 1000;
+        fclose(fp);
+        remove("Livros.dat");
+        b.codLivro=1000;
     }
     else
     {
@@ -570,31 +571,31 @@ void editarLivro(LIVROS b, EMPRESTIMOS c)
                             strupr(b.nomeLivro);
                             setbuf(stdin,NULL);
 
-                            gotoxy(34,6);
+                            gotoxy(34,5);
                             printf("NOME DO AUTOR:");
                             setbuf(stdin, NULL);
                             gets(b.nomeAutor);
                             strupr(b.nomeAutor);
                             setbuf(stdin, NULL);
 
-                            gotoxy(34,8);
+                            gotoxy(34,6);
                             printf("AREA DO LIVRO:");
                             setbuf(stdin, NULL);
                             gets(b.area);
                             strupr(b.area);
                             setbuf(stdin, NULL);
 
-                            gotoxy(34,10);
+                            gotoxy(34,7);
                             printf("QUANTIDADE:");
                             scanf("%d", &b.qtda);
 
-                            gotoxy(34,12);
+                            gotoxy(34,9);
                             printf("LIVRO EDITADO!");
 
                             fseek(fp,ftell(fp)-sizeof(b),0);
                             fwrite(&b,sizeof(b),1,fp);
                             fclose(fp);
-                            gotoxy(34,14);
+                            gotoxy(34,11);
                             system("pause");
                         }
                     }
@@ -644,6 +645,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
     {
         i++;
     }
+    fclose(fp);
     //SE NAO EXISTIR NENHUM...
     if(i==0)
     {
@@ -660,6 +662,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         printf("DIGITE CODIGO DO LIVRO PARA REMOVER:");
         scanf("%d", &d);
 
+        fp=fopen("Emprestimos.dat", "rb+");
         rewind(fp);
         //LER O ARQUIVO DOS EMPRESTIMOS EM BUSCA DO CODIGO DO LIVRO
         while(fread(&c,sizeof(c),1,fp)==1)
@@ -669,6 +672,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                 i++;
             }
         }
+        fclose(fp);
         //SE ENCONTRAR ALGUM...
         if(i>0)
         {
@@ -683,6 +687,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         {
             i=0;
 
+            fp=fopen("Livros.dat", "rb+");
             rewind(fp);
 
             while (fread(&b, sizeof(b),1,fp)==1)
@@ -692,6 +697,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                     i++;
                 }
             }
+            fclose(fp);
             //SE NAO ENCONTRAR NENHUM...
             if(i==0)
             {
@@ -703,8 +709,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
             }
             else
             {
-                rewind(fp);
-                fs=fopen("remover.dat", "wb+");
+                fp=fopen("Livros.dat","ab+");
                 rewind(fp);
                 //BUSCA O LIVRO DE ACORDO COM O CODIGO.
                 while(fread(&b,sizeof(b),1,fp)==1)
@@ -730,7 +735,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
 
                     if (o=='S')
                     {
-
+                        fs=fopen("remover.dat", "wb+");
                         rewind(fp);
                         rewind(fs);
 
@@ -742,26 +747,29 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                                 setbuf(stdin, NULL);
                             }
                         }
-                        fclose(fs);
                         fclose(fp);
                         remove("Livros.dat");
+                        fclose(fs);
                         rename("remover.dat","Livros.dat");
                         gotoxy(34,14);
                         printf("LIVRO REMOVIDO!");
                         gotoxy(34,16);
                         system("pause");
                     }
+
+
+
+                    if(o=='N')
+                    {
+                        fclose(fp);
+                        fclose(fs);
+                        remove("remover.dat");
+                        gotoxy(34,14);
+                        printf("CANCELADO: O CADASTRO DO LIVRO NAO FOI REMOVIDO!");
+                        gotoxy(34,16);
+                        system("pause");
+                    }
                 }
-            }
-            if(o=='N')
-            {
-                fclose(fp);
-                fclose(fs);
-                remove("remover.dat");
-                gotoxy(34,14);
-                printf("CANCELADO: O CADASTRO DO LIVRO NAO FOI REMOVIDO!");
-                gotoxy(34,16);
-                system("pause");
             }
         }
     }
@@ -778,30 +786,12 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
 
         if (o=='S')
         {
-            i=0;
-            fp=fopen("Livros.dat", "rb+");
-            //LER O ARQUIVO DE LIVROS EM BUSCA DE CADASTROS
-            while(fread(&b,sizeof(b),1,fp)==1)
-            {
-                i++;
-            }
-            //SE NAO EXISTIR NENHUM...
-            if(i==0)
-            {
-                gotoxy(34,7);
-                printf("NENHUM LIVRO CADASTRADO!");
-                gotoxy(34,9);
-            }
-            //SE EXISTIR ALGUM...
-            else
-            {
-                removerLivro(b,c);
-            }
+            removerLivro(b,c);
         }
     }
     while(o!='N');
-fclose(fp);
-fclose(fs);
+    fclose(fp);
+    fclose(fs);
 }
 
 //FUNCAO QUE LISTA TODOS OS LIVROS CADASTRADOS.
