@@ -453,6 +453,7 @@ void cadastroLivro(LIVROS b)
         }
     }
     while(c!='N');
+    fclose(fp);
 }
 
 //FUNCAO PARA EDITAR O LIVRO.
@@ -652,7 +653,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         system("pause");
     }
     //SE EXISTIR ALGUM...
-    if(i!=0)
+    else
     {
         i=0;
         gotoxy(34,4);
@@ -691,7 +692,6 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                     i++;
                 }
             }
-            fclose(fp);
             //SE NAO ENCONTRAR NENHUM...
             if(i==0)
             {
@@ -703,8 +703,8 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
             }
             else
             {
-                fs=fopen("remove.dat", "wb+");
-                fp=fopen("Livros.dat","rb+");
+                rewind(fp);
+                fs=fopen("remover.dat", "wb+");
                 rewind(fp);
                 //BUSCA O LIVRO DE ACORDO COM O CODIGO.
                 while(fread(&b,sizeof(b),1,fp)==1)
@@ -745,7 +745,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                         fclose(fs);
                         fclose(fp);
                         remove("Livros.dat");
-                        rename("remove.dat","Livros.dat");
+                        rename("remover.dat","Livros.dat");
                         gotoxy(34,14);
                         printf("LIVRO REMOVIDO!");
                         gotoxy(34,16);
@@ -757,7 +757,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
             {
                 fclose(fp);
                 fclose(fs);
-                remove("remove.dat");
+                remove("remover.dat");
                 gotoxy(34,14);
                 printf("CANCELADO: O CADASTRO DO LIVRO NAO FOI REMOVIDO!");
                 gotoxy(34,16);
@@ -779,7 +779,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         if (o=='S')
         {
             i=0;
-            fp=fopen("Livros.dat", "rb");
+            fp=fopen("Livros.dat", "rb+");
             //LER O ARQUIVO DE LIVROS EM BUSCA DE CADASTROS
             while(fread(&b,sizeof(b),1,fp)==1)
             {
@@ -800,7 +800,8 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         }
     }
     while(o!='N');
-
+fclose(fp);
+fclose(fs);
 }
 
 //FUNCAO QUE LISTA TODOS OS LIVROS CADASTRADOS.
@@ -1183,7 +1184,7 @@ void removerAluno(ALUNOS a, EMPRESTIMOS c)
 
                     if (o=='S')
                     {
-                        fs=fopen("remove.dat", "wb+");
+                        fs=fopen("remover.dat", "wb+");
                         rewind(fp);
                         while(fread(&a,sizeof(a),1,fp)==1)
                         {
@@ -1196,7 +1197,7 @@ void removerAluno(ALUNOS a, EMPRESTIMOS c)
                         fclose(fs);
                         fclose(fp);
                         remove("Alunos.dat");
-                        rename("remove.dat","Alunos.dat");
+                        rename("remover.dat","Alunos.dat");
                         gotoxy(34,12);
                         printf("CADASTRO DE ALUNO REMOVIDO!");
                         gotoxy(34,14);
@@ -1550,7 +1551,7 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
             if (o=='S')
             {
                 fp=fopen("Emprestimos.dat", "ab+");
-                fs=fopen("remove.dat", "wb+");
+                fs=fopen("remover.dat", "wb+");
                 rewind(fp);
                 while(fread(&c,sizeof(c),1,fp)==1)
                 {
@@ -1563,7 +1564,7 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
                 fclose(fs);
                 fclose(fp);
                 remove("Emprestimos.dat");
-                rename("remove.dat","Emprestimos.dat");
+                rename("remover.dat","Emprestimos.dat");
                 gotoxy(34,14);
                 printf("DEVOLUCAO CONFIRMADA!");
                 gotoxy(34,16);
