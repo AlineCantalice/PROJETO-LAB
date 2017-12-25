@@ -354,27 +354,16 @@ void cadastroLivro(LIVROS b)
 {
     int o, i=0, tam=0;
     char c, nomeL[21];
-    //ABRE O ARQUIVO DE LIVROS
-    fp=fopen("Livros.dat", "rb");
+
     system("cls");
 
     gotoxy(52,2);
     printf("CADASTRO DE LIVROS");
     setbuf(stdin, NULL);
 
-    //GERA-SE O CODIGO, DEVE VIR ANTES DO CADASTRO.
-    fseek (fp,ftell(fp)-sizeof(b),SEEK_END);
-
-    if (fread(&b,sizeof(b),1,fp)!=1)
-    {
-        b.codLivro= 1000;
-    }
-    else
-    {
-        fscanf(fp,"%d",&b.codLivro);
-        b.codLivro=b.codLivro+1;
-    }
-
+    //ABRE O ARQUIVO DE LIVROS
+    fp=fopen("Livros.dat", "rb+");
+    //fclose(fp);
     //CADASTRO DO LIVRO.
     gotoxy(34,4);
     printf("DIGITE NOME DO LIVRO:");
@@ -392,6 +381,22 @@ void cadastroLivro(LIVROS b)
             printf("LIVRO JA CADASTRADO!");
             gotoxy(34,8);
         }
+    }
+
+    rewind(fp);
+
+
+    //GERA-SE O CODIGO, DEVE VIR ANTES DO CADASTRO.
+    fseek (fp,ftell(fp)-sizeof(b),SEEK_END);
+
+    if (fread(&b,sizeof(b),1,fp)!=1)
+    {
+        b.codLivro= 1000;
+    }
+    else
+    {
+        fscanf(fp,"%d",&b.codLivro);
+        b.codLivro=b.codLivro+1;
     }
     fclose(fp);
 
@@ -429,6 +434,7 @@ void cadastroLivro(LIVROS b)
         printf("CODIGO DO LIVRO: %d", b.codLivro);
         gotoxy(34,13);
     }
+
     system("pause");
     system("cls");
     do
@@ -631,31 +637,28 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
     gotoxy(52,2);
     printf("REMOVER LIVRO:");
 
-    fp=fopen("Livros.dat", "rb");
-    rewind(fp);
+    fp=fopen("Livros.dat", "rb+");
     //LER O ARQUIVO DE LIVROS EM BUSCA DE CADASTROS
     while(fread(&b,sizeof(b),1,fp)==1)
     {
         i++;
     }
-    fclose(fp);
     //SE NAO EXISTIR NENHUM...
     if(i==0)
     {
-        system("cls");
-        gotoxy(34,2);
-        printf("NENHUM LIVRO CADASTRADO!");
         gotoxy(34,4);
+        printf("NENHUM LIVRO CADASTRADO!");
+        gotoxy(34,6);
+        system("pause");
     }
     //SE EXISTIR ALGUM...
-    else
+    if(i!=0)
     {
         i=0;
         gotoxy(34,4);
         printf("DIGITE CODIGO DO LIVRO PARA REMOVER:");
         scanf("%d", &d);
 
-        fp=fopen("Emprestimos.dat", "rb");
         rewind(fp);
         //LER O ARQUIVO DOS EMPRESTIMOS EM BUSCA DO CODIGO DO LIVRO
         while(fread(&c,sizeof(c),1,fp)==1)
@@ -665,7 +668,6 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                 i++;
             }
         }
-        fclose(fp);
         //SE ENCONTRAR ALGUM...
         if(i>0)
         {
@@ -680,7 +682,6 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         {
             i=0;
 
-            fp=fopen("Livros.dat","rb+");
             rewind(fp);
 
             while (fread(&b, sizeof(b),1,fp)==1)
@@ -702,7 +703,8 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
             }
             else
             {
-                fp=fopen("Livros.dat","ab+");
+                fs=fopen("remove.dat", "wb+");
+                fp=fopen("Livros.dat","rb+");
                 rewind(fp);
                 //BUSCA O LIVRO DE ACORDO COM O CODIGO.
                 while(fread(&b,sizeof(b),1,fp)==1)
@@ -728,7 +730,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
 
                     if (o=='S')
                     {
-                        fs=fopen("remove.dat", "wb");
+
                         rewind(fp);
                         rewind(fs);
 
@@ -750,14 +752,16 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                         system("pause");
                     }
                 }
-                if(o=='N')
-                {
-                    fclose(fp);
-                    gotoxy(34,14);
-                    printf("CANCELADO: O CADASTRO DO LIVRO NAO FOI REMOVIDO!");
-                    gotoxy(34,16);
-                    system("pause");
-                }
+            }
+            if(o=='N')
+            {
+                fclose(fp);
+                fclose(fs);
+                remove("remove.dat");
+                gotoxy(34,14);
+                printf("CANCELADO: O CADASTRO DO LIVRO NAO FOI REMOVIDO!");
+                gotoxy(34,16);
+                system("pause");
             }
         }
     }
@@ -774,10 +778,29 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
 
         if (o=='S')
         {
-            removerLivro(b,c);
+            i=0;
+            fp=fopen("Livros.dat", "rb");
+            //LER O ARQUIVO DE LIVROS EM BUSCA DE CADASTROS
+            while(fread(&b,sizeof(b),1,fp)==1)
+            {
+                i++;
+            }
+            //SE NAO EXISTIR NENHUM...
+            if(i==0)
+            {
+                gotoxy(34,7);
+                printf("NENHUM LIVRO CADASTRADO!");
+                gotoxy(34,9);
+            }
+            //SE EXISTIR ALGUM...
+            else
+            {
+                removerLivro(b,c);
+            }
         }
     }
     while(o!='N');
+
 }
 
 //FUNCAO QUE LISTA TODOS OS LIVROS CADASTRADOS.
