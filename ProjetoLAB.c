@@ -727,9 +727,9 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                 }
                 if(o=='N')
                 {
-                    gotoxy(34,12);
-                    printf("CANCELADO: O CADASTRO DO LIVRO NAO FOI REMOVIDO!");
                     gotoxy(34,14);
+                    printf("CANCELADO: O CADASTRO DO LIVRO NAO FOI REMOVIDO!");
+                    gotoxy(34,16);
                     system("pause");
                 }
             }
@@ -967,19 +967,19 @@ void editarAluno(ALUNOS a, EMPRESTIMOS c)
                         fseek(fp,ftell(fp)-sizeof(a),0);
                         fwrite(&a,sizeof(a),1,fp);
                         fclose(fp);
-                        gotoxy(34,9);
-                        printf("CADASTRO DO ALUNO FOI EDITADO COM SUCESSO!");
                         gotoxy(34,11);
+                        printf("CADASTRO DO ALUNO FOI EDITADO COM SUCESSO!");
+                        gotoxy(34,13);
                         system("pause");
-                        gotoxy(49,19);
+                        gotoxy(49,15);
                     }
                 }
             }
             if(o=='N')
             {
-                gotoxy(34,9);
-                printf("CANCELADO: O CADASTRO DO ALUNO NAO FOI EDITADO!");
                 gotoxy(34,11);
+                printf("CANCELADO: O CADASTRO DO ALUNO NAO FOI EDITADO!");
+                gotoxy(34,13);
                 system("pause");
             }
             if(i==0)
@@ -1126,17 +1126,17 @@ void removerAluno(ALUNOS a, EMPRESTIMOS c)
                         fclose(fp);
                         remove("Alunos.dat");
                         rename("remove.dat","Alunos.dat");
-                        gotoxy(34,10);
-                        printf("CADASTRO DE ALUNO REMOVIDO!");
                         gotoxy(34,12);
+                        printf("CADASTRO DE ALUNO REMOVIDO!");
+                        gotoxy(34,14);
                         system("pause");
                     }
                 }
                 if(o=='N')
                 {
-                    gotoxy(34,10);
-                    printf("CANCELADO: O CADASTRO DO ALUNO NAO FOI REMOVIDO!");
                     gotoxy(34,12);
+                    printf("CANCELADO: O CADASTRO DO ALUNO NAO FOI REMOVIDO!");
+                    gotoxy(34,14);
                     system("pause");
                 }
             }
@@ -1374,19 +1374,19 @@ void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c)
                             //ESCREVE TODAS AS INFORMACOES NO ARQUIVO
                             fwrite(&c,sizeof(c),1,fp);
                             fclose(fp);
-                            gotoxy(34,4);
-                            printf("EMPRESTIMO REALIZADO!");
-                            gotoxy(34,6);
-                            printf("DATA: %s",c.dataAtual);
                             gotoxy(34,8);
-                            printf("DEVOLUCAO: %s",c.dataDevolucao);
+                            printf("EMPRESTIMO REALIZADO!");
                             gotoxy(34,10);
+                            printf("DATA: %s",c.dataAtual);
+                            gotoxy(34,12);
+                            printf("DEVOLUCAO: %s",c.dataDevolucao);
+                            gotoxy(34,14);
                         }
                         if(o=='N')
                         {
-                            gotoxy(34,4);
+                            gotoxy(34,8);
                             printf("CANCELADO: EMPRESTIMO NAO REALIZADO!");
-                            gotoxy(34,6);
+                            gotoxy(34,10);
                         }
                     }
                 }
@@ -1484,9 +1484,9 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
                 fclose(fp);
                 remove("Emprestimos.dat");
                 rename("remove.dat","Emprestimos.dat");
-                gotoxy(34,12);
-                printf("DEVOLUCAO CONFIRMADA!");
                 gotoxy(34,14);
+                printf("DEVOLUCAO CONFIRMADA!");
+                gotoxy(34,16);
                 //APOS A DEVOLUCAO A QUANTIDADE DO LIVRO E CREMENTADA EM 1
                 fp=fopen("Livros.dat","rb+");
                 while(fread(&b,sizeof(b),1,fp)==1)
@@ -1503,9 +1503,9 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
             }
             if(o=='N')
             {
-                gotoxy(34,12);
-                printf("CANCELADO: DEVOLUCAO NAO CONFIRMADA!");
                 gotoxy(34,14);
+                printf("CANCELADO: DEVOLUCAO NAO CONFIRMADA!");
+                gotoxy(34,16);
             }
         }
         system("pause");
