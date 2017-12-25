@@ -649,6 +649,19 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         //SE NAO ENCONTRAR NENHUM...
         else
         {
+            i=0;
+
+            fp=fopen("Livros.dat","rb");
+
+            while (fread(&b, sizeof(b),1,fp)==1)
+            {
+                if(b.codLivro==d)
+                {
+                    i++;
+                }
+            }
+            fclose(fp);
+            //SE NAO ENCONTRAR NENHUM...
             if(i==0)
             {
                 system("cls");
@@ -659,7 +672,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
             }
             else
             {
-                fp=fopen("Livros.dat","ab+");
+                fp=fopen("Livros.dat", "ab+");
                 //BUSCA O LIVRO DE ACORDO COM O CODIGO.
                 while(fread(&b,sizeof(b),1,fp)==1)
                 {
