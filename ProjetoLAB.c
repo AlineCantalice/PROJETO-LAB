@@ -484,6 +484,18 @@ void editarLivro(LIVROS b, EMPRESTIMOS c)
         }
         else
         {
+            i=0;
+
+            fp=fopen("Livros.dat","rb");
+
+            while (fread(&b, sizeof(b),1,fp)==1)
+            {
+                if(b.codLivro==d)
+                {
+                    i++;
+                }
+            }
+            fclose(fp);
             //SE NAO ENCONTRAR NENHUM...
             if(i==0)
             {
@@ -495,7 +507,7 @@ void editarLivro(LIVROS b, EMPRESTIMOS c)
             }
             else
             {
-                fp=fopen("Livros.dat","rb+");
+                fp=fopen("Livros.dat", "rb+");
                 //BUSCA O LIVRO NO ARUIVO DE ACORDO COM SEU CODIGO.
                 while (fread(&b, sizeof(b),1,fp)==1)
                 {
