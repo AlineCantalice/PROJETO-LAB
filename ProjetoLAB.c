@@ -13,18 +13,18 @@ FILE *fp, *fs;
 
 typedef struct
 {
-    char nomeLivro[31], nomeAutor[31], area[31];
+    char nomeLivro[21], nomeAutor[21], area[21];
     int codLivro, qtda, numero;
 } LIVROS;
 
 typedef struct
 {
-    char nomeAluno[31], matricula[15], cpf[19];
+    char nomeAluno[21], matricula[15], cpf[19];
 } ALUNOS;
 
 typedef struct
 {
-    char aluno[31], livro[31], mat[15], dataAtual[15], dataDevolucao[15];
+    char aluno[21], livro[21], mat[15], dataAtual[15], dataDevolucao[15];
     int cod;
 } EMPRESTIMOS;
 
@@ -352,10 +352,10 @@ void menuListaEmprestimo ()
 //FUNCAO QUE REALIZA O CADASTRO DO LIVRO.
 void cadastroLivro(LIVROS b)
 {
-    int o;
-    char c;
+    int o, i=0;
+    char c, nomeL[21];
     //ABRE O ARQUIVO DE LIVROS
-    fp=fopen("Livros.dat", "ab+");
+    fp=fopen("Livros.dat", "rb");
     system("cls");
 
     gotoxy(52,2);
@@ -378,36 +378,56 @@ void cadastroLivro(LIVROS b)
     //CADASTRO DO LIVRO.
     gotoxy(34,4);
     printf("DIGITE NOME DO LIVRO:");
-    gets(b.nomeLivro);
-    strupr(b.nomeLivro);
+    setbuf(stdin,NULL);
+    gets(nomeL);
+    strupr(nomeL);
     setbuf(stdin, NULL);
 
-    gotoxy(34,5);
-    printf("DIGITE NOME DO AUTOR:");
-    gets(b.nomeAutor);
-    strupr(b.nomeAutor);
-    setbuf(stdin, NULL);
-
-    gotoxy(34,6);
-    printf("DIGITE AREA DO LIVRO:");
-    gets (b.area);
-    strupr(b.area);
-    setbuf(stdin, NULL);
-
-    gotoxy(34,7);
-    printf("DIGITE QUANTIDADE DO LIVRO:");
-    scanf("%d", &b.qtda);
-    setbuf(stdin, NULL);
-
-    fseek(fp,0,SEEK_END);
-    fwrite(&b, sizeof(b), 1, fp);
+    while(fread(&b,sizeof(b),1,fp)==1)
+    {
+        if(strcmp(nomeL,b.nomeLivro)==0)
+        {
+            i++;
+            gotoxy(34,6);
+            printf("LIVRO JA CADASTRADO!");
+            gotoxy(34,8);
+        }
+    }
     fclose(fp);
 
-    gotoxy(34,9);
-    printf("O LIVRO FOI CADASTRADO CORRETAMENTE!");
-    gotoxy(34,11);
-    printf("CODIGO DO LIVRO: %d", b.codLivro);
-    gotoxy(34,13);
+    if(i==0)
+    {
+        fp=fopen("Livros.dat", "ab+");
+        strcpy(b.nomeLivro, nomeL);
+        gotoxy(34,5);
+        printf("DIGITE NOME DO AUTOR:");
+        setbuf(stdin, NULL);
+        gets(b.nomeAutor);
+        strupr(b.nomeAutor);
+        setbuf(stdin, NULL);
+
+        gotoxy(34,6);
+        printf("DIGITE AREA DO LIVRO:");
+        setbuf(stdin, NULL);
+        gets (b.area);
+        strupr(b.area);
+        setbuf(stdin, NULL);
+
+        gotoxy(34,7);
+        printf("DIGITE QUANTIDADE DO LIVRO:");
+        scanf("%d", &b.qtda);
+        setbuf(stdin, NULL);
+
+        fseek(fp,0,SEEK_END);
+        fwrite(&b, sizeof(b), 1, fp);
+        fclose(fp);
+
+        gotoxy(34,9);
+        printf("O LIVRO FOI CADASTRADO CORRETAMENTE!");
+        gotoxy(34,11);
+        printf("CODIGO DO LIVRO: %d", b.codLivro);
+        gotoxy(34,13);
+    }
     system("pause");
     system("cls");
     do
@@ -817,34 +837,56 @@ void listarLivro(LIVROS b)
 //REALIZA O CADASTRO DOS ALUNOS.
 void cadastroAluno(ALUNOS a)
 {
-    int o;
-    char c;
+    int o, i=0;
+    char c, matA[21];
 
-    fp=fopen("Alunos.dat", "ab+");
     system("cls");
     gotoxy(52,2);
     printf("CADASTRO DE ALUNOS");
     setbuf(stdin, NULL);
     gotoxy(34,4);
-    printf("DIGITE NOME DO ALUNO:");
-    gets(a.nomeAluno);
-    strupr(a.nomeAluno);
-    setbuf(stdin, NULL);
-    gotoxy(34,5);
     printf("DIGITE MATRICULA DO ALUNO:");
-    gets(a.matricula);
     setbuf(stdin, NULL);
-    gotoxy(34,6);
-    printf("DIGITE CPF DO ALUNO:");
-    gets (a.cpf);
+    gets(matA);
     setbuf(stdin, NULL);
 
-    fseek(fp,0,SEEK_END);
-    fwrite(&a, sizeof(a), 1, fp);
+    fp=fopen("Alunos.dat", "rb");
+
+    while(fread(&a,sizeof(a),1,fp)==1)
+    {
+        if(strcmp(matA,a.matricula)==0)
+        {
+            i++;
+            gotoxy(34,7);
+            printf("ALUNO JA CADASTRADO!");
+            gotoxy(34,9);
+        }
+    }
     fclose(fp);
-    gotoxy(34,8);
-    printf("O ALUNO FOI CADASTRADO CORRETAMENTE!");
-    gotoxy(34,10);
+
+    if(i==0)
+    {
+        fp=fopen("Alunos.dat", "ab+");
+        strcpy(a.matricula, matA);
+        gotoxy(34,5);
+        printf("DIGITE NOME DO ALUNO:");
+        setbuf(stdin, NULL);
+        gets(a.nomeAluno);
+        strupr(a.nomeAluno);
+        setbuf(stdin, NULL);
+        gotoxy(34,6);
+        printf("DIGITE CPF DO ALUNO:");
+        setbuf(stdin, NULL);
+        gets (a.cpf);
+        setbuf(stdin, NULL);
+
+        fseek(fp,0,SEEK_END);
+        fwrite(&a, sizeof(a), 1, fp);
+        fclose(fp);
+        gotoxy(34,8);
+        printf("O ALUNO FOI CADASTRADO CORRETAMENTE!");
+        gotoxy(34,10);
+    }
     system("pause");
     system("cls");
     do
