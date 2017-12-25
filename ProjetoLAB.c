@@ -412,6 +412,8 @@ void cadastroLivro(LIVROS b)
     system("cls");
     do
     {
+        gotoxy(52,2);
+        printf("CADASTRO DE LIVROS");
         gotoxy(34,4);
         printf ("CADASTRAR OUTRO? S-SIM OU N-NAO");
         gotoxy(49,6);
@@ -501,44 +503,47 @@ void editarLivro(LIVROS b, EMPRESTIMOS c)
                     printf("AREA:%s", b.area);
                     gotoxy(34,10);
                     printf ("EDITAR LIVRO? S-SIM OU N-NAO");
+                    gotoxy(49,12);
                     o=getch();
                     o=toupper(o);
 
                     if (o=='S')
                     {
                         system("cls");
-                        gotoxy(34,5);
+                        gotoxy(52,2);
+                        printf("EDICAO DE LIVROS:");
+                        gotoxy(34,4);
                         printf("NOVO NOME:");
                         setbuf(stdin,NULL);
                         gets(b.nomeLivro);
                         strupr(b.nomeLivro);
                         setbuf(stdin,NULL);
 
-                        gotoxy(34,7);
+                        gotoxy(34,6);
                         printf("NOME DO AUTOR:");
                         setbuf(stdin, NULL);
                         gets(b.nomeAutor);
                         strupr(b.nomeAutor);
                         setbuf(stdin, NULL);
 
-                        gotoxy(34,9);
+                        gotoxy(34,8);
                         printf("AREA DO LIVRO:");
                         setbuf(stdin, NULL);
                         gets(b.area);
                         strupr(b.area);
                         setbuf(stdin, NULL);
 
-                        gotoxy(34,11);
+                        gotoxy(34,10);
                         printf("QUANTIDADE:");
                         scanf("%d", &b.qtda);
 
-                        gotoxy(34,13);
+                        gotoxy(34,12);
                         printf("LIVRO EDITADO!");
 
                         fseek(fp,ftell(fp)-sizeof(b),0);
                         fwrite(&b,sizeof(b),1,fp);
                         fclose(fp);
-                        gotoxy(34,15);
+                        gotoxy(34,14);
                         system("pause");
                     }
                 }
@@ -550,8 +555,9 @@ void editarLivro(LIVROS b, EMPRESTIMOS c)
     {
         gotoxy(52,2);
         printf("EDICAO DE LIVROS:");
-        gotoxy(34,5);
+        gotoxy(34,4);
         printf ("EDITAR OUTRO? S-SIM OU N-NAO");
+        gotoxy(49,6);
         o=getch();
         o=toupper(o);
 
@@ -637,6 +643,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                     printf("QUANTIDADE: %d", b.qtda);
                     gotoxy(34,12);
                     printf("DELETAR? S-SIM OU N-NAO");
+                    gotoxy(49,14);
                     o=getch();
                     o=toupper(o);
                 }
@@ -673,6 +680,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         printf("REMOVER LIVRO:");
         gotoxy(34,5);
         printf ("REMOVER OUTRO? S-SIM OU N-NAO");
+        gotoxy(49,7);
         o=getch();
         o=toupper(o);
 
@@ -874,6 +882,8 @@ void editarAluno(ALUNOS a, EMPRESTIMOS c)
                     if (o=='S')
                     {
                         system("cls");
+                        gotoxy(52,2);
+                        printf("EDICAO DE ALUNOS:");
                         setbuf(stdin, NULL);
                         gotoxy(34,5);
                         printf("NOVO NOME:");
@@ -942,7 +952,7 @@ void removerAluno(ALUNOS a, EMPRESTIMOS c)
 
     system("cls");
     gotoxy(52,2);
-    printf("REMOVER ALUNO\n");
+    printf("REMOVER ALUNO");
 
     fp=fopen("Alunos.dat", "rb");
     rewind(fp);
@@ -1034,8 +1044,11 @@ void removerAluno(ALUNOS a, EMPRESTIMOS c)
     system("cls");
     do
     {
+        gotoxy(52,2);
+        printf("REMOVER ALUNO");
         gotoxy(34,4);
         printf ("REMOVER OUTRO? S-SIM N-NAO.");
+        gotoxy(49,6);
         o=getch();
         o=toupper(o);
 
@@ -1228,6 +1241,7 @@ void novoEmprestimo(LIVROS b, ALUNOS a, EMPRESTIMOS c)
                         system("cls");
                         gotoxy(34,4);
                         printf("REALIZAR EMPRESTIMO? S-SIM OU N-NAO.");
+                        gotoxy(49,6);
                         o=getch();
                         o=toupper(o);
 
@@ -1342,6 +1356,7 @@ void devolucaoEmprestimo(EMPRESTIMOS c, LIVROS b)
         {
             gotoxy(34,12);
             printf("CONFIRMAR DEVOLUCAO? S-SIM OU N-NAO.");
+            gotoxy(49,14);
             o=getch();
             o=toupper(o);
 
