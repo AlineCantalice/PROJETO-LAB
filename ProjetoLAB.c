@@ -655,6 +655,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         scanf("%d", &d);
 
         fp=fopen("Emprestimos.dat", "rb");
+        rewind(fp);
         //LER O ARQUIVO DOS EMPRESTIMOS EM BUSCA DO CODIGO DO LIVRO
         while(fread(&c,sizeof(c),1,fp)==1)
         {
@@ -678,7 +679,8 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
         {
             i=0;
 
-            fp=fopen("Livros.dat","rb");
+            fp=fopen("Livros.dat","rb+");
+            rewind(fp);
 
             while (fread(&b, sizeof(b),1,fp)==1)
             {
@@ -699,7 +701,8 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
             }
             else
             {
-                fp=fopen("Livros.dat", "ab+");
+                fp=fopen("Livros.dat","ab+");
+                rewind(fp);
                 //BUSCA O LIVRO DE ACORDO COM O CODIGO.
                 while(fread(&b,sizeof(b),1,fp)==1)
                 {
@@ -724,8 +727,9 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
 
                     if (o=='S')
                     {
-                        rewind(fp);
                         fs=fopen("remove.dat", "wb");
+                        rewind(fp);
+                        rewind(fs);
 
                         while(fread(&b,sizeof(b),1,fp)==1)
                         {
@@ -747,6 +751,7 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                 }
                 if(o=='N')
                 {
+                    fclose(fp);
                     gotoxy(34,14);
                     printf("CANCELADO: O CADASTRO DO LIVRO NAO FOI REMOVIDO!");
                     gotoxy(34,16);
