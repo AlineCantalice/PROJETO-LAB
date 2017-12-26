@@ -705,13 +705,13 @@ void removerLivro(LIVROS b, EMPRESTIMOS c)
                     gotoxy(34,16);
                 }
             }
-        }
-        if(o=='N')
-        {
-            fclose(fp);
-            gotoxy(34,14);
-            printf("CANCELADO: CADASTRO NAO REMOVIDO!");
-            gotoxy(34,16);
+            if(o=='N')
+            {
+                fclose(fp);
+                gotoxy(34,14);
+                printf("CANCELADO: CADASTRO NAO REMOVIDO!");
+                gotoxy(34,16);
+            }
         }
     }
     system("pause");
@@ -1073,14 +1073,13 @@ void removerAluno(ALUNOS a, EMPRESTIMOS c)
                     gotoxy(34,16);
                 }
             }
-        }
-
-        if(o=='N')
-        {
-            fclose(fp);
-            gotoxy(34,12);
-            printf("CANCELADO: O CADASTRO DO ALUNO NAO FOI REMOVIDO!");
-            gotoxy(34,14);
+            if(o=='N')
+            {
+                fclose(fp);
+                gotoxy(34,12);
+                printf("CANCELADO: O CADASTRO DO ALUNO NAO FOI REMOVIDO!");
+                gotoxy(34,14);
+            }
         }
     }
     system("pause");
